@@ -1,4 +1,3 @@
-
 import csv
 import cv2
 import mediapipe as mp
@@ -11,10 +10,6 @@ MODEL_PATH = os.path.join(
     "pose_landmarker.task"
 )
 
-
-# --------------------------------------------------
-# MediaPipe landmark indices
-# --------------------------------------------------
 
 JOINTS = [
     "left_shoulder",
@@ -48,20 +43,7 @@ MP_INDEX = {
 }
 
 
-# --------------------------------------------------
-# Pose extraction
-# --------------------------------------------------
-
 def extract_pose(video_path, output_csv=None):
-    """
-    Extract MediaPipe pose landmarks from a video.
-
-    If output_csv is provided, the landmarks are also
-    saved in CSV format for the KOA model.
-
-    Returns:
-        list of frame landmarks
-    """
 
     cap = cv2.VideoCapture(video_path)
 
@@ -75,7 +57,42 @@ def extract_pose(video_path, output_csv=None):
     if fps <= 0:
         fps = 30.0
 
-    all_frames = []
+    fieldnames = [
+        "frame",
+        "detected"
+    ]
+
+    for joint in JOINTS:
+        fieldnames += [
+            f"w_{joint}_x",
+            f"w_{joint}_y",
+            f"w_{joint}_z",
+            f"{joint}_x",
+            f"{joint}_y",
+            f"{joint}_v"
+        ]
+
+    # Open CSV before processing so frames are written immediately.
+    csv_file = None
+    writer = None
+
+    if output_csv:
+        csv_file = open(
+            output_csv,
+            "w",
+            newline="",
+            encoding="utf-8"
+        )
+
+        writer = csv.DictWriter(
+            csv_file,
+            fieldnames=fieldnames
+        )
+
+        writer.writeheader()
+
+    frames_processed = 0
+    frames_detected = 0
 
     options = mp.tasks.vision.PoseLandmarkerOptions(
         base_options=mp.tasks.BaseOptions(
@@ -85,177 +102,107 @@ def extract_pose(video_path, output_csv=None):
         num_poses=1
     )
 
-    with mp.tasks.vision.PoseLandmarker.create_from_options(
-        options
-    ) as landmarker:
+    try:
 
-        frame_index = 0
+        with mp.tasks.vision.PoseLandmarker.create_from_options(
+            options
+        ) as landmarker:
 
-        while True:
+            while True:
 
-            success, frame = cap.read()
+                success, frame = cap.read()
 
-            if not success:
-                break
+                if not success:
+                    break
 
-            # Show progress every 10 frames
-            if frame_index % 10 == 0:
-                print(
-                    f"Processing frame {frame_index}...",
-                    flush=True
+                if frames_processed % 10 == 0:
+                    print(
+                        f"Processing frame {frames_processed}...",
+                        flush=True
+                    )
+
+                rgb = cv2.cvtColor(
+                    frame,
+                    cv2.COLOR_BGR2RGB
                 )
 
-            # OpenCV BGR -> RGB
-            rgb = cv2.cvtColor(
-                frame,
-                cv2.COLOR_BGR2RGB
-            )
+                image = mp.Image(
+                    image_format=mp.ImageFormat.SRGB,
+                    data=rgb
+                )
 
-            # Convert to MediaPipe image
-            image = mp.Image(
-                image_format=mp.ImageFormat.SRGB,
-                data=rgb
-            )
+                timestamp_ms = int(
+                    (frames_processed / fps) * 1000
+                )
 
-            # MediaPipe VIDEO mode requires increasing timestamps
-            timestamp_ms = int(
-                (frame_index / fps) * 1000
-            )
-
-            result = landmarker.detect_for_video(
-                image,
-                timestamp_ms
-            )
-
-            frame_data = []
-
-            # --------------------------------------------------
-            # Pose landmarks
-            # --------------------------------------------------
-
-            if result.pose_landmarks:
-
-                pose = result.pose_landmarks[0]
-
-                # World landmarks are available with this model
-                if result.pose_world_landmarks:
-                    world = result.pose_world_landmarks[0]
-                else:
-                    world = None
-
-                for i in range(33):
-
-                    lm = pose[i]
-
-                    item = {
-                        "x": lm.x,
-                        "y": lm.y,
-                        "z": lm.z,
-                        "visibility": lm.visibility
-                    }
-
-                    if world:
-                        w = world[i]
-
-                        item["wx"] = w.x
-                        item["wy"] = w.y
-                        item["wz"] = w.z
-
-                    frame_data.append(item)
-
-            all_frames.append(frame_data)
-
-            frame_index += 1
-
-    cap.release()
-
-    # --------------------------------------------------
-    # Save CSV
-    # --------------------------------------------------
-
-    if output_csv:
-
-        fieldnames = [
-            "frame",
-            "detected"
-        ]
-
-        for joint in JOINTS:
-
-            fieldnames += [
-                f"w_{joint}_x",
-                f"w_{joint}_y",
-                f"w_{joint}_z",
-                f"{joint}_x",
-                f"{joint}_y",
-                f"{joint}_v"
-            ]
-
-        with open(
-            output_csv,
-            "w",
-            newline="",
-            encoding="utf-8"
-        ) as f:
-
-            writer = csv.DictWriter(
-                f,
-                fieldnames=fieldnames
-            )
-
-            writer.writeheader()
-
-            for frame_number, landmarks in enumerate(
-                all_frames
-            ):
+                result = landmarker.detect_for_video(
+                    image,
+                    timestamp_ms
+                )
 
                 row = {
-                    "frame": frame_number,
-                    "detected": int(bool(landmarks))
+                    "frame": frames_processed,
+                    "detected": 0
                 }
 
-                if landmarks:
+                if result.pose_landmarks:
+
+                    pose = result.pose_landmarks[0]
+
+                    if result.pose_world_landmarks:
+                        world = result.pose_world_landmarks[0]
+                    else:
+                        world = None
+
+                    row["detected"] = 1
+                    frames_detected += 1
 
                     for joint in JOINTS:
 
                         index = MP_INDEX[joint]
 
-                        lm = landmarks[index]
+                        lm = pose[index]
 
-                        row[
-                            f"w_{joint}_x"
-                        ] = lm.get("wx", "")
+                        row[f"{joint}_x"] = lm.x
+                        row[f"{joint}_y"] = lm.y
+                        row[f"{joint}_v"] = lm.visibility
 
-                        row[
-                            f"w_{joint}_y"
-                        ] = lm.get("wy", "")
+                        if world:
+                            w = world[index]
 
-                        row[
-                            f"w_{joint}_z"
-                        ] = lm.get("wz", "")
+                            row[f"w_{joint}_x"] = w.x
+                            row[f"w_{joint}_y"] = w.y
+                            row[f"w_{joint}_z"] = w.z
 
-                        row[
-                            f"{joint}_x"
-                        ] = lm["x"]
+                if writer:
+                    writer.writerow(row)
 
-                        row[
-                            f"{joint}_y"
-                        ] = lm["y"]
+                frames_processed += 1
 
-                        row[
-                            f"{joint}_v"
-                        ] = lm["visibility"]
+    finally:
 
-                writer.writerow(row)
+        cap.release()
 
-        print(
-            f"CSV written: {output_csv}",
-            flush=True
-        )
+        if csv_file:
+            csv_file.close()
 
-        print(
-            f"Frames processed: {len(all_frames)}",
-            flush=True
-        )
+    print(
+        f"CSV written: {output_csv}",
+        flush=True
+    )
 
-    return all_frames
+    print(
+        f"Frames processed: {frames_processed}",
+        flush=True
+    )
+
+    print(
+        f"Frames detected: {frames_detected}",
+        flush=True
+    )
+
+    # Return only lightweight information.
+    return {
+        "frames_processed": frames_processed,
+        "frames_detected": frames_detected
+    }

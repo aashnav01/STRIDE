@@ -217,22 +217,19 @@ async def extract_pose_endpoint(video: UploadFile = File(...)):
 
         print("Extracting pose landmarks...")
 
-        landmarks = extract_pose(
+        pose_stats = extract_pose(
             video_path,
             csv_path
         )
 
-        detected = sum(
-            bool(frame)
-            for frame in landmarks
-        )
+        frames_processed = pose_stats["frames_processed"]
+        frames_detected = pose_stats["frames_detected"]
 
         print(
             f"Pose extraction complete: "
-            f"{len(landmarks)} frames, "
-            f"{detected} detected"
+            f"{frames_processed} frames, "
+            f"{frames_detected} detected"
         )
-
         # ----------------------------------------------------
         # KOA prediction
         # ----------------------------------------------------
