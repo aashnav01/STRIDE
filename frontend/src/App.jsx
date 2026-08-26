@@ -1,7 +1,7 @@
 
 import { useState } from 'react'
 import './App.css'
-const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
+const API_URL = 'https://koa-backend-ygct.onrender.com'
 
 function App() {
   const [selectedVideo, setSelectedVideo] = useState(null)
@@ -14,12 +14,23 @@ function App() {
   const handleVideoChange = (event) => {
     const file = event.target.files[0]
 
-    if (file) {
-      setSelectedVideo(file)
-      setVideoUrl(URL.createObjectURL(file))
+    if (!file) return
+
+    // Maximum upload size: 50 MB
+    const MAX_SIZE = 50 * 1024 * 1024
+
+    if (file.size > MAX_SIZE) {
+      setSelectedVideo(null)
+      setVideoUrl(null)
       setResult(null)
-      setError(null)
+      setError('Video is too large. Please select a video smaller than 50 MB.')
+      return
     }
+
+    setSelectedVideo(file)
+    setVideoUrl(URL.createObjectURL(file))
+    setResult(null)
+    setError(null)
   }
 
   const handleAnalyze = async () => {
