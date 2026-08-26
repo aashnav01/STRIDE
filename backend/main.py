@@ -226,10 +226,11 @@ async def extract_pose_endpoint(video: UploadFile = File(...)):
         frames_detected = pose_stats["frames_detected"]
 
         print(
-            f"Pose extraction complete: "
-            f"{frames_processed} frames, "
-            f"{frames_detected} detected"
+           f"Pose extraction complete: "
+           f"{frames_processed} frames, "
+           f"{frames_detected} detected"
         )
+
         # ----------------------------------------------------
         # KOA prediction
         # ----------------------------------------------------
@@ -237,7 +238,7 @@ async def extract_pose_endpoint(video: UploadFile = File(...)):
         print("Running KOA model...")
 
         result = screener.score_landmarks(
-            csv_path
+          csv_path
         )
 
         print("KOA prediction complete")
@@ -262,8 +263,8 @@ async def extract_pose_endpoint(video: UploadFile = File(...)):
         return {
             "success": True,
             "filename": video.filename,
-            "frames_processed": len(landmarks),
-            "frames_detected": detected,
+            "frames_processed": frames_processed,
+            "frames_detected": frames_detected,
             "csv_available": os.path.exists(csv_path),
             "prediction": result,
         }
