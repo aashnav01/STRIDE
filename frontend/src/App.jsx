@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 import './App.css'
 
@@ -28,7 +29,6 @@ function App() {
     setError(null)
 
     const formData = new FormData()
-
     formData.append('video', selectedVideo)
 
     try {
@@ -67,6 +67,113 @@ function App() {
     } finally {
       setAnalyzing(false)
     }
+  }
+  const downloadPDF = async () => {
+    if (!result) return
+
+    try {
+      console.log('📄 Generating PDF...')
+
+      const response = await fetch(
+        'http://127.0.0.1:8000/generate-report',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(result),
+        }
+      )
+
+      console.log('📥 PDF response:', response.status)
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(
+          errorData.detail || 'PDF generation failed'
+        )
+      }
+
+      const blob = await response.blob()
+
+      const url = window.URL.createObjectURL(blob)
+
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'OA_Screening_Report.pdf'
+
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      window.URL.revokeObjectURL(url)
+
+      console.log('✅ PDF downloaded successfully')
+
+    } catch (err) {
+      console.error('❌ PDF error:', err)
+
+      setError(
+        err.message || 'Could not generate PDF report.'
+      )
+    }
+  }
+  const downloadCSV = () => {
+    if (!result) return
+
+    const prediction = result.prediction
+
+    let csv = 'OA Risk Analysis Report\n\n'
+
+    csv += 'Risk Score,' +
+      `${(prediction.risk * 100).toFixed(1)}%\n`
+
+    csv += 'Risk Band,' +
+      `${prediction.band}\n`
+
+    if (prediction.stage) {
+      csv += 'Severity Grade,' +
+        `${prediction.stage.grade}\n`
+
+      csv += 'Confidence,' +
+        `"${prediction.stage.confidence}"\n`
+    }
+
+    csv += '\nGait Measurements\n'
+    csv += 'Measurement,Value,Unit,Reading\n'
+
+    if (prediction.measurements) {
+      prediction.measurements.forEach((measurement) => {
+        csv += `"${measurement.label}",`
+        csv += `"${measurement.value}",`
+        csv += `"${measurement.unit}",`
+        csv += `"${measurement.reading}"\n`
+      })
+    }
+
+    csv += '\nAnalysis Information\n'
+    csv += `Frames Processed,${result.frames_processed}\n`
+    csv += `Frames Detected,${result.frames_detected}\n`
+
+    csv += '\nDisclaimer\n'
+    csv += '"AI-assisted screening result. Not a medical diagnosis."\n'
+
+    const blob = new Blob(
+      [csv],
+      { type: 'text/csv;charset=utf-8;' }
+    )
+
+    const url = URL.createObjectURL(blob)
+
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'OA_Analysis_Report.csv'
+
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    URL.revokeObjectURL(url)
   }
 
   return (
@@ -218,9 +325,7 @@ function App() {
           {error && (
 
             <div className="error-message">
-
               ❌ {error}
-
             </div>
 
           )}
@@ -232,14 +337,28 @@ function App() {
 
           <section className="results-card">
 
-            <h2>
-              Analysis Result
-            </h2>
+            <div className="report-header">
+
+              <span className="badge">
+                ANALYSIS COMPLETE
+              </span>
+
+              <h2>
+                OA Risk Analysis Report
+              </h2>
+
+              <p>
+                Generated from gait analysis of the
+                uploaded walking video.
+              </p>
+
+            </div>
+
 
             <div className="result-main">
 
               <h3>
-                Risk Score
+                OA Risk Score
               </h3>
 
               <div className="risk-score">
@@ -265,7 +384,7 @@ function App() {
               <div className="stage-result">
 
                 <h3>
-                  Stage
+                  Severity
                 </h3>
 
                 <p>
@@ -299,23 +418,76 @@ function App() {
                     key={index}
                   >
 
-                    <strong>
-                      {measurement.label}
-                    </strong>
+                    <div>
+                      <strong>
+                        {measurement.label}
+                      </strong>
+
+                      <p>
+                        {measurement.reading}
+                      </p>
+                    </div>
 
                     <span>
                       {measurement.value}{' '}
                       {measurement.unit}
                     </span>
 
-                    <p>
-                      {measurement.reading}
-                    </p>
-
                   </div>
 
                 )
               )}
+
+            </div>
+
+
+            <div className="analysis-info">
+
+              <h3>
+                Analysis Information
+              </h3>
+
+              <p>
+                <strong>
+                  Frames processed:
+                </strong>{' '}
+                {result.frames_processed}
+              </p>
+
+              <p>
+                <strong>
+                  Frames detected:
+                </strong>{' '}
+                {result.frames_detected}
+              </p>
+
+              <p>
+                <strong>
+                  Pose extraction:
+                </strong>{' '}
+                Completed
+              </p>
+
+              <p>
+                <strong>
+                  KOA prediction:
+                </strong>{' '}
+                Completed
+              </p>
+
+            </div>
+
+
+            <div className="report-actions">
+
+
+              <button
+                className="download-button"
+                onClick={downloadPDF}
+                disabled={!result}
+              >
+                📄 Download PDF
+              </button>
 
             </div>
 
@@ -392,11 +564,11 @@ function App() {
             </div>
 
             <h3>
-              Result
+              Report
             </h3>
 
             <p>
-              View the generated analysis.
+              Download the analysis report.
             </p>
 
           </div>
@@ -420,3 +592,4 @@ function App() {
 }
 
 export default App
+

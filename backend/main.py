@@ -1,28 +1,62 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import os
-import uuid
-import sys
+from fastapi.responses import Response
 
+import os
+import sys
+import uuid
+from io import BytesIO
+from datetime import datetime
+
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    Table,
+    TableStyle,
+    KeepTogether,
+)
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from reportlab.lib.units import mm
+
+
+# ============================================================
 # Make backend/code importable
-CODE_DIR = os.path.join(os.path.dirname(__file__), "code")
+# ============================================================
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+CODE_DIR = os.path.join(BASE_DIR, "code")
+
 if CODE_DIR not in sys.path:
     sys.path.insert(0, CODE_DIR)
+
+
+# ============================================================
+# Imports from project
+# ============================================================
 
 from pose_extractor import extract_pose
 from koa_deploy import KOAScreener
 
 
+# ============================================================
+# FastAPI
+# ============================================================
+
 app = FastAPI(
     title="KOA Risk & Severity Prediction API",
-    description="API for gait-based KOA risk screening",
-    version="1.0.0"
+    description="Offline gait-based KOA screening API",
+    version="1.0.0",
 )
 
 
-# --------------------------------------------------
+# ============================================================
 # CORS
-# --------------------------------------------------
+# ============================================================
 
 app.add_middleware(
     CORSMiddleware,
@@ -36,11 +70,9 @@ app.add_middleware(
 )
 
 
-# --------------------------------------------------
+# ============================================================
 # Paths
-# --------------------------------------------------
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# ============================================================
 
 MODEL_DIR = os.path.join(BASE_DIR, "models")
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
@@ -48,11 +80,13 @@ UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
-# --------------------------------------------------
-# Load actual KOA model
-# --------------------------------------------------
+# ============================================================
+# Load KOA model
+# ============================================================
 
+print("=" * 60)
 print("Loading KOA model...")
+print("=" * 60)
 
 try:
     screener = KOAScreener(
@@ -60,79 +94,127 @@ try:
         use_graph=False
     )
 
-    print("✅ KOA Model loaded successfully!")
-    print(f"✅ Features: {len(screener.features)}")
-    print(f"✅ Window: {screener.window}")
-    print(f"✅ Windows/video: {screener.windows_per_video}")
+    print("KOA model loaded successfully")
+    print(f"Features       : {len(screener.features)}")
+    print(f"Window         : {screener.window}")
+    print(f"Windows/video  : {screener.windows_per_video}")
+    print(f"Severity model : {'loaded' if screener.severity else 'not loaded'}")
 
 except Exception as e:
     screener = None
-    print(f"❌ KOA model loading failed: {e}")
+
+    print("KOA model failed to load")
+    print(type(e).__name__, e)
 
 
-# --------------------------------------------------
-# Endpoints
-# --------------------------------------------------
+# ============================================================
+# Health check
+# ============================================================
 
 @app.get("/")
 def root():
     return {
-        "message": "KOA Prediction API is running!"
+        "status": "online",
+        "service": "KOA Risk & Severity Prediction API",
+        "model_loaded": screener is not None,
+        "offline": True,
     }
 
 
 @app.get("/health")
 def health():
     return {
-        "status": "healthy",
-        "model_loaded": screener is not None
+        "status": "healthy" if screener is not None else "model_error",
+        "model_loaded": screener is not None,
     }
 
 
-# --------------------------------------------------
-# Video analysis
-# --------------------------------------------------
+# ============================================================
+# VIDEO ANALYSIS
+# ============================================================
 
 @app.post("/extract-pose")
-async def extract_pose_from_video(
-    video: UploadFile = File(...)
-):
+async def extract_pose_endpoint(video: UploadFile = File(...)):
 
-    video_id = str(uuid.uuid4())
+    if screener is None:
+        raise HTTPException(
+            status_code=500,
+            detail="KOA model is not loaded."
+        )
 
-    extension = os.path.splitext(
-        video.filename or ""
-    )[1]
+    # --------------------------------------------------------
+    # Validate file
+    # --------------------------------------------------------
+
+    if not video.filename:
+        raise HTTPException(
+            status_code=400,
+            detail="No video file supplied."
+        )
+
+    allowed_extensions = (
+        ".mp4",
+        ".mov",
+        ".avi",
+        ".mkv",
+        ".webm",
+    )
+
+    extension = os.path.splitext(video.filename)[1].lower()
+
+    if extension not in allowed_extensions:
+        raise HTTPException(
+            status_code=400,
+            detail="Unsupported video format."
+        )
+
+    # --------------------------------------------------------
+    # Create temporary filenames
+    # --------------------------------------------------------
+
+    file_id = str(uuid.uuid4())
 
     video_path = os.path.join(
         UPLOAD_DIR,
-        f"{video_id}{extension}"
+        f"{file_id}{extension}"
     )
 
     csv_path = os.path.join(
         UPLOAD_DIR,
-        f"{video_id}.csv"
+        f"{file_id}.csv"
     )
 
     try:
 
-        print(f"📥 Received video: {video.filename}")
-
-        # ------------------------------------------
+        # ----------------------------------------------------
         # Save uploaded video
-        # ------------------------------------------
+        # ----------------------------------------------------
 
-        content = await video.read()
+        print()
+        print("=" * 60)
+        print("NEW VIDEO ANALYSIS")
+        print("=" * 60)
+
+        print(f"Video: {video.filename}")
 
         with open(video_path, "wb") as f:
-            f.write(content)
 
-        print("✅ Video saved")
-        print("🧍 Extracting pose landmarks...")
+            while True:
 
-        # ------------------------------------------
+                chunk = await video.read(1024 * 1024)
+
+                if not chunk:
+                    break
+
+                f.write(chunk)
+
+        print("Video saved")
+
+        # ----------------------------------------------------
         # MediaPipe pose extraction
-        # ------------------------------------------
+        # ----------------------------------------------------
+
+        print("Extracting pose landmarks...")
 
         landmarks = extract_pose(
             video_path,
@@ -145,58 +227,964 @@ async def extract_pose_from_video(
         )
 
         print(
-            f"✅ Pose extraction complete: "
+            f"Pose extraction complete: "
             f"{len(landmarks)} frames, "
             f"{detected} detected"
         )
 
-        # ------------------------------------------
+        # ----------------------------------------------------
         # KOA prediction
-        # ------------------------------------------
+        # ----------------------------------------------------
 
-        if screener is None:
-            raise RuntimeError(
-                "KOA model is not loaded."
-            )
-
-        print("🧠 Running KOA model...")
+        print("Running KOA model...")
 
         result = screener.score_landmarks(
             csv_path
         )
 
-        print("✅ Prediction complete")
-        print(result)
+        print("KOA prediction complete")
 
-        # ------------------------------------------
+        print(
+            f"Risk  : {result.get('risk')}"
+        )
+
+        print(
+            f"Band  : {result.get('band')}"
+        )
+
+        if result.get("stage"):
+            print(
+                f"Stage : {result['stage'].get('grade')}"
+            )
+
+        # ----------------------------------------------------
         # Return result to React
-        # ------------------------------------------
+        # ----------------------------------------------------
 
         return {
             "success": True,
             "filename": video.filename,
             "frames_processed": len(landmarks),
             "frames_detected": detected,
-            "prediction": result
+            "csv_available": os.path.exists(csv_path),
+            "prediction": result,
         }
 
     except Exception as e:
 
-        print(f"❌ Analysis error: {e}")
+        print()
+        print("ANALYSIS ERROR")
+        print(type(e).__name__, e)
 
-        return {
-            "success": False,
-            "error": str(e)
-        }
+        raise HTTPException(
+            status_code=500,
+            detail=f"Video analysis failed: {str(e)}"
+        )
 
     finally:
 
-        # ------------------------------------------
-        # Cleanup temporary files
-        # ------------------------------------------
+        # ----------------------------------------------------
+        # Remove temporary video
+        # ----------------------------------------------------
 
-        if os.path.exists(video_path):
-            os.remove(video_path)
+        try:
+            if os.path.exists(video_path):
+                os.remove(video_path)
+        except Exception:
+            pass
 
-        if os.path.exists(csv_path):
-            os.remove(csv_path)
+        # ----------------------------------------------------
+        # Keep CSV temporarily for now
+        # ----------------------------------------------------
+        #
+        # We will later decide whether the CSV should:
+        # 1. download directly
+        # 2. remain locally
+        # 3. be included in the PDF
+        #
+        # ----------------------------------------------------
+
+
+# ============================================================
+# PDF REPORT GENERATOR
+# ============================================================
+
+@app.post("/generate-report")
+async def generate_report(data: dict):
+
+    try:
+
+        prediction = data.get("prediction", {})
+
+        filename = data.get(
+            "filename",
+            "Walking Video"
+        )
+
+        frames_processed = data.get(
+            "frames_processed",
+            0
+        )
+
+        frames_detected = data.get(
+            "frames_detected",
+            0
+        )
+
+        risk = prediction.get(
+            "risk",
+            0
+        )
+
+        band = prediction.get(
+            "band",
+            "unknown"
+        )
+
+        stage = prediction.get(
+            "stage"
+        )
+
+        measurements = prediction.get(
+            "measurements",
+            []
+        )
+
+        reasons = prediction.get(
+            "reasons",
+            []
+        )
+
+        caveats = prediction.get(
+            "caveats",
+            []
+        )
+
+        # ====================================================
+        # PDF buffer
+        # ====================================================
+
+        buffer = BytesIO()
+
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=A4,
+            rightMargin=15 * mm,
+            leftMargin=15 * mm,
+            topMargin=14 * mm,
+            bottomMargin=14 * mm,
+        )
+
+        styles = getSampleStyleSheet()
+
+        title_style = ParagraphStyle(
+            "ReportTitle",
+            parent=styles["Title"],
+            fontName="Helvetica-Bold",
+            fontSize=18,
+            leading=22,
+            alignment=TA_LEFT,
+            spaceAfter=5,
+        )
+
+        subtitle_style = ParagraphStyle(
+            "Subtitle",
+            parent=styles["Normal"],
+            fontSize=9,
+            leading=12,
+            textColor=colors.HexColor("#555555"),
+        )
+
+        section_style = ParagraphStyle(
+            "Section",
+            parent=styles["Heading2"],
+            fontName="Helvetica-Bold",
+            fontSize=11,
+            leading=14,
+            spaceBefore=9,
+            spaceAfter=5,
+        )
+
+        normal_style = ParagraphStyle(
+            "NormalReport",
+            parent=styles["Normal"],
+            fontSize=8.5,
+            leading=12,
+        )
+
+        small_style = ParagraphStyle(
+            "Small",
+            parent=styles["Normal"],
+            fontSize=7.5,
+            leading=10,
+            textColor=colors.HexColor("#666666"),
+        )
+
+        center_small = ParagraphStyle(
+            "CenterSmall",
+            parent=small_style,
+            alignment=TA_CENTER,
+        )
+
+        # ====================================================
+        # Helpers
+        # ====================================================
+
+        def safe(value):
+            if value is None:
+                return "—"
+            return str(value)
+
+        def pct(value):
+
+            try:
+                return f"{float(value) * 100:.1f}%"
+            except Exception:
+                return "—"
+
+        def page_number(canvas, doc):
+
+            canvas.saveState()
+
+            canvas.setFont(
+                "Helvetica",
+                7
+            )
+
+            canvas.setFillColor(
+                colors.HexColor("#777777")
+            )
+
+            canvas.drawRightString(
+                A4[0] - 15 * mm,
+                7 * mm,
+                f"page {doc.page} of 1"
+            )
+
+            canvas.restoreState()
+
+        # ====================================================
+        # DOCUMENT CONTENT
+        # ====================================================
+
+        story = []
+
+        # ----------------------------------------------------
+        # HEADER
+        # ----------------------------------------------------
+
+        story.append(
+            Paragraph(
+                "OSTEOARTHRITIS RISK SCREENING REPORT",
+                title_style
+            )
+        )
+
+        story.append(
+            Paragraph(
+                "AI-Assisted Gait Analysis",
+                subtitle_style
+            )
+        )
+
+        story.append(Spacer(1, 4))
+
+        metadata = [
+            [
+                Paragraph(
+                    "<b>Test Subject</b>",
+                    normal_style
+                ),
+                safe(filename),
+            ],
+            [
+                Paragraph(
+                    "<b>Date & Time</b>",
+                    normal_style
+                ),
+                datetime.now().strftime(
+                    "%d %B %Y, %I:%M %p"
+                ),
+            ],
+        ]
+
+        metadata_table = Table(
+            metadata,
+            colWidths=[
+                35 * mm,
+                145 * mm,
+            ],
+        )
+
+        metadata_table.setStyle(
+            TableStyle([
+                (
+                    "GRID",
+                    (0, 0),
+                    (-1, -1),
+                    0.4,
+                    colors.HexColor("#DDDDDD")
+                ),
+                (
+                    "BACKGROUND",
+                    (0, 0),
+                    (0, -1),
+                    colors.HexColor("#F4F5F7")
+                ),
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "MIDDLE"
+                ),
+                (
+                    "FONTNAME",
+                    (0, 0),
+                    (-1, -1),
+                    "Helvetica"
+                ),
+                (
+                    "FONTSIZE",
+                    (0, 0),
+                    (-1, -1),
+                    8
+                ),
+                (
+                    "LEFTPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    6
+                ),
+                (
+                    "RIGHTPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    6
+                ),
+                (
+                    "TOPPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    5
+                ),
+                (
+                    "BOTTOMPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    5
+                ),
+            ])
+        )
+
+        story.append(metadata_table)
+
+        story.append(Spacer(1, 4))
+
+        story.append(
+            Paragraph(
+                "<i>Estimated from a single walking clip. "
+                "This report supports screening and referral discussion; "
+                "it does not make a clinical diagnosis.</i>",
+                small_style
+            )
+        )
+
+        # ====================================================
+        # SCREENING RISK
+        # ====================================================
+
+        story.append(
+            Paragraph(
+                "SCREENING RISK",
+                section_style
+            )
+        )
+
+        risk_percent = pct(risk)
+
+        risk_data = [
+            [
+                Paragraph(
+                    "<b>LOW</b>",
+                    center_small
+                ),
+                Paragraph(
+                    "<b>BORDERLINE</b>",
+                    center_small
+                ),
+                Paragraph(
+                    "<b>ELEVATED</b>",
+                    center_small
+                ),
+            ],
+            [
+                Paragraph(
+                    "0.00 – 0.34",
+                    center_small
+                ),
+                Paragraph(
+                    "0.35 – 0.64",
+                    center_small
+                ),
+                Paragraph(
+                    "0.65 – 1.00",
+                    center_small
+                ),
+            ],
+        ]
+
+        risk_table = Table(
+            risk_data,
+            colWidths=[
+                60 * mm,
+                60 * mm,
+                60 * mm,
+            ],
+            rowHeights=[
+                9 * mm,
+                7 * mm,
+            ],
+        )
+
+        band_column = {
+            "low": 0,
+            "borderline": 1,
+            "elevated": 2,
+        }.get(
+            str(band).lower(),
+            0
+        )
+
+        risk_table.setStyle(
+            TableStyle([
+                (
+                    "GRID",
+                    (0, 0),
+                    (-1, -1),
+                    0.5,
+                    colors.HexColor("#BBBBBB")
+                ),
+                (
+                    "BACKGROUND",
+                    (band_column, 0),
+                    (band_column, 1),
+                    colors.HexColor("#DCEEFF")
+                ),
+                (
+                    "FONTNAME",
+                    (band_column, 0),
+                    (band_column, 0),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "ALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "CENTER"
+                ),
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "MIDDLE"
+                ),
+            ])
+        )
+
+        story.append(risk_table)
+
+        story.append(Spacer(1, 4))
+
+        story.append(
+            Paragraph(
+                f"<b>Observed screening score: "
+                f"{risk_percent} — {safe(band).upper()}</b>",
+                normal_style
+            )
+        )
+
+        # ====================================================
+        # SEVERITY
+        # ====================================================
+
+        story.append(
+            Paragraph(
+                "SEVERITY STAGE",
+                section_style
+            )
+        )
+
+        if stage:
+
+            grade = safe(
+                stage.get("grade")
+            )
+
+            expected = safe(
+                stage.get("expected_grade")
+            )
+
+            confidence = safe(
+                stage.get("confidence")
+            )
+
+            story.append(
+                Paragraph(
+                    f"<b>Most likely stage:</b> {grade}<br/>"
+                    f"Expected grade: {expected} on a 0–2 scale.<br/>"
+                    f"{confidence}",
+                    normal_style
+                )
+            )
+
+            probabilities = stage.get(
+                "probabilities",
+                {}
+            )
+
+            probability_data = [
+                [
+                    "Early",
+                    "Moderate",
+                    "Severe",
+                ],
+                [
+                    pct(probabilities.get("early", 0)),
+                    pct(probabilities.get("moderate", 0)),
+                    pct(probabilities.get("severe", 0)),
+                ],
+            ]
+
+            probability_table = Table(
+                probability_data,
+                colWidths=[
+                    60 * mm,
+                    60 * mm,
+                    60 * mm,
+                ],
+            )
+
+            probability_table.setStyle(
+                TableStyle([
+                    (
+                        "GRID",
+                        (0, 0),
+                        (-1, -1),
+                        0.4,
+                        colors.HexColor("#CCCCCC")
+                    ),
+                    (
+                        "BACKGROUND",
+                        (0, 0),
+                        (-1, 0),
+                        colors.HexColor("#F4F5F7")
+                    ),
+                    (
+                        "ALIGN",
+                        (0, 0),
+                        (-1, -1),
+                        "CENTER"
+                    ),
+                    (
+                        "FONTNAME",
+                        (0, 0),
+                        (-1, 0),
+                        "Helvetica-Bold"
+                    ),
+                    (
+                        "FONTSIZE",
+                        (0, 0),
+                        (-1, -1),
+                        8
+                    ),
+                    (
+                        "TOPPADDING",
+                        (0, 0),
+                        (-1, -1),
+                        5
+                    ),
+                    (
+                        "BOTTOMPADDING",
+                        (0, 0),
+                        (-1, -1),
+                        5
+                    ),
+                ])
+            )
+
+            story.append(
+                Spacer(1, 3)
+            )
+
+            story.append(
+                probability_table
+            )
+
+        else:
+
+            story.append(
+                Paragraph(
+                    "Severity staging was not available "
+                    "for this analysis.",
+                    normal_style
+                )
+            )
+
+        # ====================================================
+        # SECTION 1
+        # ====================================================
+
+        story.append(
+            Paragraph(
+                "1. WHAT WAS MEASURED",
+                section_style
+            )
+        )
+
+        measurement_data = [
+            [
+                "Measurement",
+                "This person",
+                "Cohort median",
+                "Reading",
+            ]
+        ]
+
+        for m in measurements:
+
+            value = safe(
+                m.get("value")
+            )
+
+            unit = safe(
+                m.get("unit")
+            )
+
+            median = safe(
+                m.get("cohort_median")
+            )
+
+            measurement_data.append([
+                safe(m.get("label")),
+                f"{value} {unit}",
+                f"{median} {unit}",
+                safe(m.get("reading")),
+            ])
+
+        if len(measurement_data) == 1:
+
+            measurement_data.append([
+                "No measurements available",
+                "—",
+                "—",
+                "—",
+            ])
+
+        measurement_table = Table(
+            measurement_data,
+            colWidths=[
+                65 * mm,
+                35 * mm,
+                35 * mm,
+                45 * mm,
+                ],
+            repeatRows=1,
+        )
+
+        measurement_table.setStyle(
+            TableStyle([
+                (
+                    "GRID",
+                    (0, 0),
+                    (-1, -1),
+                    0.4,
+                    colors.HexColor("#CCCCCC")
+                ),
+                (
+                    "BACKGROUND",
+                    (0, 0),
+                    (-1, 0),
+                    colors.HexColor("#E9EEF5")
+                ),
+                (
+                    "FONTNAME",
+                    (0, 0),
+                    (-1, 0),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "FONTSIZE",
+                    (0, 0),
+                    (-1, -1),
+                    7
+                ),
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "TOP"
+                ),
+                (
+                    "LEFTPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    4
+                ),
+                (
+                    "RIGHTPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    4
+                ),
+                (
+                    "TOPPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    4
+                ),
+                (
+                    "BOTTOMPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    4
+                ),
+            ])
+        )
+
+        story.append(
+            measurement_table
+        )
+
+        # ====================================================
+        # SECTION 2
+        # ====================================================
+
+        story.append(
+            Paragraph(
+                "2. WHY THIS SCORE",
+                section_style
+            )
+        )
+
+        if reasons:
+
+            for reason in reasons:
+
+                story.append(
+                    Paragraph(
+                        f"• {safe(reason)}",
+                        normal_style
+                    )
+                )
+
+                story.append(
+                    Spacer(1, 2)
+                )
+
+        else:
+
+            story.append(
+                Paragraph(
+                    "No explanatory factors were returned "
+                    "by the model.",
+                    normal_style
+                )
+            )
+
+        fidelity = prediction.get(
+            "surrogate_fidelity"
+        )
+
+        if fidelity is not None:
+
+            story.append(
+                Spacer(1, 3)
+            )
+
+            story.append(
+                Paragraph(
+                    f"<i>Explainability model fidelity: "
+                    f"{safe(fidelity)}.</i>",
+                    small_style
+                )
+            )
+
+        # ====================================================
+        # SECTION 3
+        # ====================================================
+
+        story.append(
+            Paragraph(
+                "3. CAPTURE QUALITY",
+                section_style
+            )
+        )
+
+        clip_length = "Not available"
+
+        quality_data = [
+            [
+                "clip length",
+                "frames with a pose",
+                "knee visibility",
+                "windows scored",
+                "model",
+            ],
+            [
+                clip_length,
+                f"{frames_detected}/{frames_processed}",
+                "See measurements",
+                safe(prediction.get("n_windows", "—")),
+                "KOA screener",
+            ],
+        ]
+
+        quality_table = Table(
+            quality_data,
+            colWidths=[
+                36 * mm,
+                36 * mm,
+                36 * mm,
+                36 * mm,
+                36 * mm,
+            ],
+        )
+
+        quality_table.setStyle(
+            TableStyle([
+                (
+                    "GRID",
+                    (0, 0),
+                    (-1, -1),
+                    0.4,
+                    colors.HexColor("#CCCCCC")
+                ),
+                (
+                    "BACKGROUND",
+                    (0, 0),
+                    (-1, 0),
+                    colors.HexColor("#F4F5F7")
+                ),
+                (
+                    "FONTNAME",
+                    (0, 0),
+                    (-1, 0),
+                    "Helvetica-Bold"
+                ),
+                (
+                    "ALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "CENTER"
+                ),
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "MIDDLE"
+                ),
+                (
+                    "FONTSIZE",
+                    (0, 0),
+                    (-1, -1),
+                    6.8
+                ),
+                (
+                    "TOPPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    5
+                ),
+                (
+                    "BOTTOMPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    5
+                ),
+            ])
+        )
+
+        story.append(
+            quality_table
+        )
+
+        # ====================================================
+        # SECTION 4
+        # ====================================================
+
+        story.append(
+            Paragraph(
+                "4. LIMITS OF THIS RESULT",
+                section_style
+            )
+        )
+
+        if caveats:
+
+            for caveat in caveats:
+
+                story.append(
+                    Paragraph(
+                        f"• {safe(caveat)}",
+                        normal_style
+                    )
+                )
+
+                story.append(
+                    Spacer(1, 2)
+                )
+
+        # ====================================================
+        # FOOTER DISCLAIMER
+        # ====================================================
+
+        story.append(
+            Spacer(1, 6)
+        )
+
+        story.append(
+            Paragraph(
+                "<b>Important:</b> This is an AI-assisted "
+                "screening result for research purposes. "
+                "It is not a medical diagnosis and should "
+                "not replace evaluation by a qualified "
+                "healthcare professional.",
+                small_style
+            )
+        )
+
+        # ====================================================
+        # BUILD PDF
+        # ====================================================
+
+        doc.build(
+            story,
+            onFirstPage=page_number,
+            onLaterPages=page_number,
+        )
+
+        pdf = buffer.getvalue()
+
+        buffer.close()
+
+        return Response(
+            content=pdf,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition":
+                    'attachment; filename="OA_Screening_Report.pdf"'
+            },
+        )
+
+    except Exception as e:
+
+        print(
+            "PDF generation error:",
+            type(e).__name__,
+            e
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail=f"PDF generation failed: {str(e)}"
+        )
