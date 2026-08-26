@@ -72,7 +72,6 @@ def extract_pose(video_path, output_csv=None):
             f"{joint}_v"
         ]
 
-    # Open CSV before processing so frames are written immediately.
     csv_file = None
     writer = None
 
@@ -121,6 +120,31 @@ def extract_pose(video_path, output_csv=None):
                         flush=True
                     )
 
+                # ------------------------------------------------
+                # Reduce frame resolution before MediaPipe
+                # ------------------------------------------------
+
+                height, width = frame.shape[:2]
+
+                MAX_WIDTH = 640
+
+                if width > MAX_WIDTH:
+
+                    scale = MAX_WIDTH / width
+
+                    new_width = MAX_WIDTH
+                    new_height = int(height * scale)
+
+                    frame = cv2.resize(
+                        frame,
+                        (new_width, new_height),
+                        interpolation=cv2.INTER_AREA
+                    )
+
+                # ------------------------------------------------
+                # OpenCV BGR -> RGB
+                # ------------------------------------------------
+
                 rgb = cv2.cvtColor(
                     frame,
                     cv2.COLOR_BGR2RGB
@@ -168,6 +192,7 @@ def extract_pose(video_path, output_csv=None):
                         row[f"{joint}_v"] = lm.visibility
 
                         if world:
+
                             w = world[index]
 
                             row[f"w_{joint}_x"] = w.x
@@ -201,7 +226,6 @@ def extract_pose(video_path, output_csv=None):
         flush=True
     )
 
-    # Return only lightweight information.
     return {
         "frames_processed": frames_processed,
         "frames_detected": frames_detected
