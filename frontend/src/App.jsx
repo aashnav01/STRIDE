@@ -1,6 +1,7 @@
 
 import { useState } from 'react'
 import './App.css'
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 
 function App() {
   const [selectedVideo, setSelectedVideo] = useState(null)
@@ -35,7 +36,7 @@ function App() {
       console.log('📤 Sending video to backend...')
 
       const response = await fetch(
-        'http://127.0.0.1:8000/extract-pose',
+        `${API_URL}/extract-pose`,
         {
           method: 'POST',
           body: formData
@@ -75,7 +76,7 @@ function App() {
       console.log('📄 Generating PDF...')
 
       const response = await fetch(
-        'http://127.0.0.1:8000/generate-report',
+        `${API_URL}/generate-report`,
         {
           method: 'POST',
           headers: {

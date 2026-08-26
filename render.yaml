@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: koa-backend
+    runtime: docker
+    rootDir: backend
+    plan: free
+
+  - type: web
+    name: koa-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    plan: free
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: koa-backend
+          property: host
