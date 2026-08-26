@@ -3,7 +3,6 @@ services:
     name: koa-backend
     runtime: docker
     rootDir: backend
-    plan: free
 
   - type: web
     name: koa-frontend
@@ -13,7 +12,4 @@ services:
     staticPublishPath: ./dist
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: koa-backend
-          property: host
+        value: https://koa-backend-ygct.onrender.com
