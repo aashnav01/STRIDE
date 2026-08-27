@@ -1,0 +1,862 @@
+{
+  "features": {
+    "kin_knee_L_mean": {
+      "feature": "kin_knee_L_mean",
+      "label": "Knee bend (left) \u2014 average",
+      "sentence": "How far the knee flexes and straightens (left): the average angle held through the walk.",
+      "unit": "degrees",
+      "high_means": "more bend",
+      "low_means": "less bend"
+    },
+    "kin_knee_L_min": {
+      "feature": "kin_knee_L_min",
+      "label": "Knee bend (left) \u2014 straightest point",
+      "sentence": "How far the knee flexes and straightens (left): the most extended the joint gets.",
+      "unit": "degrees",
+      "high_means": "the knee never fully straightens \u2014 flexion contracture",
+      "low_means": "the knee straightens normally"
+    },
+    "kin_knee_L_p05": {
+      "feature": "kin_knee_L_p05",
+      "label": "Knee bend (left) \u2014 low end",
+      "sentence": "How far the knee flexes and straightens (left): the angle at the bottom 5% of the walk.",
+      "unit": "degrees",
+      "high_means": "more bend",
+      "low_means": "less bend"
+    },
+    "kin_knee_R_mean": {
+      "feature": "kin_knee_R_mean",
+      "label": "Knee bend (right) \u2014 average",
+      "sentence": "How far the knee flexes and straightens (right): the average angle held through the walk.",
+      "unit": "degrees",
+      "high_means": "more bend",
+      "low_means": "less bend"
+    },
+    "kin_knee_R_min": {
+      "feature": "kin_knee_R_min",
+      "label": "Knee bend (right) \u2014 straightest point",
+      "sentence": "How far the knee flexes and straightens (right): the most extended the joint gets.",
+      "unit": "degrees",
+      "high_means": "the knee never fully straightens \u2014 flexion contracture",
+      "low_means": "the knee straightens normally"
+    },
+    "kin_knee_R_max": {
+      "feature": "kin_knee_R_max",
+      "label": "Knee bend (right) \u2014 most bent point",
+      "sentence": "How far the knee flexes and straightens (right): the most flexed the joint gets.",
+      "unit": "degrees",
+      "high_means": "the knee flexes fully in swing",
+      "low_means": "the knee never fully bends"
+    },
+    "kin_knee_R_p05": {
+      "feature": "kin_knee_R_p05",
+      "label": "Knee bend (right) \u2014 low end",
+      "sentence": "How far the knee flexes and straightens (right): the angle at the bottom 5% of the walk.",
+      "unit": "degrees",
+      "high_means": "more bend",
+      "low_means": "less bend"
+    },
+    "kin_knee_R_p95": {
+      "feature": "kin_knee_R_p95",
+      "label": "Knee bend (right) \u2014 high end",
+      "sentence": "How far the knee flexes and straightens (right): the angle at the top 5% of the walk.",
+      "unit": "degrees",
+      "high_means": "more bend",
+      "low_means": "less bend"
+    },
+    "kin_knee_both_mean": {
+      "feature": "kin_knee_both_mean",
+      "label": "Knee bend (both legs averaged) \u2014 average",
+      "sentence": "How far the knee flexes and straightens (both legs averaged): the average angle held through the walk.",
+      "unit": "degrees",
+      "high_means": "more bend",
+      "low_means": "less bend"
+    },
+    "kin_knee_both_min": {
+      "feature": "kin_knee_both_min",
+      "label": "Knee bend (both legs averaged) \u2014 straightest point",
+      "sentence": "How far the knee flexes and straightens (both legs averaged): the most extended the joint gets.",
+      "unit": "degrees",
+      "high_means": "the knee never fully straightens \u2014 flexion contracture",
+      "low_means": "the knee straightens normally"
+    },
+    "kin_knee_both_p05": {
+      "feature": "kin_knee_both_p05",
+      "label": "Knee bend (both legs averaged) \u2014 low end",
+      "sentence": "How far the knee flexes and straightens (both legs averaged): the angle at the bottom 5% of the walk.",
+      "unit": "degrees",
+      "high_means": "more bend",
+      "low_means": "less bend"
+    },
+    "kin_knee_both_acc_max": {
+      "feature": "kin_knee_both_acc_max",
+      "label": "Knee bend (both legs averaged) \u2014 sharpest change",
+      "sentence": "How far the knee flexes and straightens (both legs averaged): the sharpest direction change in the joint.",
+      "unit": "degrees/s\u00b2",
+      "high_means": "more bend",
+      "low_means": "less bend"
+    },
+    "kin_hip_L_mean": {
+      "feature": "kin_hip_L_mean",
+      "label": "Hip swing (left) \u2014 average",
+      "sentence": "How far the thigh swings forward and back (left): the average angle held through the walk.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_L_std": {
+      "feature": "kin_hip_L_std",
+      "label": "Hip swing (left) \u2014 steadiness",
+      "sentence": "How far the thigh swings forward and back (left): how much the angle varies from stride to stride.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_L_min": {
+      "feature": "kin_hip_L_min",
+      "label": "Hip swing (left) \u2014 straightest point",
+      "sentence": "How far the thigh swings forward and back (left): the most extended the joint gets.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_L_max": {
+      "feature": "kin_hip_L_max",
+      "label": "Hip swing (left) \u2014 most bent point",
+      "sentence": "How far the thigh swings forward and back (left): the most flexed the joint gets.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_L_rom": {
+      "feature": "kin_hip_L_rom",
+      "label": "Hip swing (left) \u2014 range of movement",
+      "sentence": "How far the thigh swings forward and back (left): the total sweep from straightest to most bent.",
+      "unit": "degrees",
+      "high_means": "a long, free stride",
+      "low_means": "a shortened, guarded stride"
+    },
+    "kin_hip_L_p05": {
+      "feature": "kin_hip_L_p05",
+      "label": "Hip swing (left) \u2014 low end",
+      "sentence": "How far the thigh swings forward and back (left): the angle at the bottom 5% of the walk.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_L_p95": {
+      "feature": "kin_hip_L_p95",
+      "label": "Hip swing (left) \u2014 high end",
+      "sentence": "How far the thigh swings forward and back (left): the angle at the top 5% of the walk.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_L_iqr": {
+      "feature": "kin_hip_L_iqr",
+      "label": "Hip swing (left) \u2014 middle spread",
+      "sentence": "How far the thigh swings forward and back (left): the spread of the middle half of the angles.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_L_vel_mean": {
+      "feature": "kin_hip_L_vel_mean",
+      "label": "Hip swing (left) \u2014 average speed of movement",
+      "sentence": "How far the thigh swings forward and back (left): how quickly the joint angle changes on average.",
+      "unit": "degrees/s",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_L_vel_max": {
+      "feature": "kin_hip_L_vel_max",
+      "label": "Hip swing (left) \u2014 fastest movement",
+      "sentence": "How far the thigh swings forward and back (left): the quickest the joint angle changes.",
+      "unit": "degrees/s",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_L_acc_mean": {
+      "feature": "kin_hip_L_acc_mean",
+      "label": "Hip swing (left) \u2014 average smoothness",
+      "sentence": "How far the thigh swings forward and back (left): how sharply the joint changes direction on average.",
+      "unit": "degrees/s\u00b2",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_L_acc_max": {
+      "feature": "kin_hip_L_acc_max",
+      "label": "Hip swing (left) \u2014 sharpest change",
+      "sentence": "How far the thigh swings forward and back (left): the sharpest direction change in the joint.",
+      "unit": "degrees/s\u00b2",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_L_cv": {
+      "feature": "kin_hip_L_cv",
+      "label": "Hip swing (left) \u2014 relative variability",
+      "sentence": "How far the thigh swings forward and back (left): variation measured relative to the average.",
+      "unit": "ratio",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_R_mean": {
+      "feature": "kin_hip_R_mean",
+      "label": "Hip swing (right) \u2014 average",
+      "sentence": "How far the thigh swings forward and back (right): the average angle held through the walk.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_R_std": {
+      "feature": "kin_hip_R_std",
+      "label": "Hip swing (right) \u2014 steadiness",
+      "sentence": "How far the thigh swings forward and back (right): how much the angle varies from stride to stride.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_R_min": {
+      "feature": "kin_hip_R_min",
+      "label": "Hip swing (right) \u2014 straightest point",
+      "sentence": "How far the thigh swings forward and back (right): the most extended the joint gets.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_R_max": {
+      "feature": "kin_hip_R_max",
+      "label": "Hip swing (right) \u2014 most bent point",
+      "sentence": "How far the thigh swings forward and back (right): the most flexed the joint gets.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_R_rom": {
+      "feature": "kin_hip_R_rom",
+      "label": "Hip swing (right) \u2014 range of movement",
+      "sentence": "How far the thigh swings forward and back (right): the total sweep from straightest to most bent.",
+      "unit": "degrees",
+      "high_means": "a long, free stride",
+      "low_means": "a shortened, guarded stride"
+    },
+    "kin_hip_R_p05": {
+      "feature": "kin_hip_R_p05",
+      "label": "Hip swing (right) \u2014 low end",
+      "sentence": "How far the thigh swings forward and back (right): the angle at the bottom 5% of the walk.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_R_p95": {
+      "feature": "kin_hip_R_p95",
+      "label": "Hip swing (right) \u2014 high end",
+      "sentence": "How far the thigh swings forward and back (right): the angle at the top 5% of the walk.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_R_iqr": {
+      "feature": "kin_hip_R_iqr",
+      "label": "Hip swing (right) \u2014 middle spread",
+      "sentence": "How far the thigh swings forward and back (right): the spread of the middle half of the angles.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_R_vel_max": {
+      "feature": "kin_hip_R_vel_max",
+      "label": "Hip swing (right) \u2014 fastest movement",
+      "sentence": "How far the thigh swings forward and back (right): the quickest the joint angle changes.",
+      "unit": "degrees/s",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_R_acc_mean": {
+      "feature": "kin_hip_R_acc_mean",
+      "label": "Hip swing (right) \u2014 average smoothness",
+      "sentence": "How far the thigh swings forward and back (right): how sharply the joint changes direction on average.",
+      "unit": "degrees/s\u00b2",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_R_acc_max": {
+      "feature": "kin_hip_R_acc_max",
+      "label": "Hip swing (right) \u2014 sharpest change",
+      "sentence": "How far the thigh swings forward and back (right): the sharpest direction change in the joint.",
+      "unit": "degrees/s\u00b2",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_R_cv": {
+      "feature": "kin_hip_R_cv",
+      "label": "Hip swing (right) \u2014 relative variability",
+      "sentence": "How far the thigh swings forward and back (right): variation measured relative to the average.",
+      "unit": "ratio",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_both_mean": {
+      "feature": "kin_hip_both_mean",
+      "label": "Hip swing (both legs averaged) \u2014 average",
+      "sentence": "How far the thigh swings forward and back (both legs averaged): the average angle held through the walk.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_both_std": {
+      "feature": "kin_hip_both_std",
+      "label": "Hip swing (both legs averaged) \u2014 steadiness",
+      "sentence": "How far the thigh swings forward and back (both legs averaged): how much the angle varies from stride to stride.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_both_min": {
+      "feature": "kin_hip_both_min",
+      "label": "Hip swing (both legs averaged) \u2014 straightest point",
+      "sentence": "How far the thigh swings forward and back (both legs averaged): the most extended the joint gets.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_both_max": {
+      "feature": "kin_hip_both_max",
+      "label": "Hip swing (both legs averaged) \u2014 most bent point",
+      "sentence": "How far the thigh swings forward and back (both legs averaged): the most flexed the joint gets.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_both_rom": {
+      "feature": "kin_hip_both_rom",
+      "label": "Hip swing (both legs averaged) \u2014 range of movement",
+      "sentence": "How far the thigh swings forward and back (both legs averaged): the total sweep from straightest to most bent.",
+      "unit": "degrees",
+      "high_means": "a long, free stride",
+      "low_means": "a shortened, guarded stride"
+    },
+    "kin_hip_both_p05": {
+      "feature": "kin_hip_both_p05",
+      "label": "Hip swing (both legs averaged) \u2014 low end",
+      "sentence": "How far the thigh swings forward and back (both legs averaged): the angle at the bottom 5% of the walk.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_both_p95": {
+      "feature": "kin_hip_both_p95",
+      "label": "Hip swing (both legs averaged) \u2014 high end",
+      "sentence": "How far the thigh swings forward and back (both legs averaged): the angle at the top 5% of the walk.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_both_iqr": {
+      "feature": "kin_hip_both_iqr",
+      "label": "Hip swing (both legs averaged) \u2014 middle spread",
+      "sentence": "How far the thigh swings forward and back (both legs averaged): the spread of the middle half of the angles.",
+      "unit": "degrees",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_both_vel_mean": {
+      "feature": "kin_hip_both_vel_mean",
+      "label": "Hip swing (both legs averaged) \u2014 average speed of movement",
+      "sentence": "How far the thigh swings forward and back (both legs averaged): how quickly the joint angle changes on average.",
+      "unit": "degrees/s",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_both_vel_max": {
+      "feature": "kin_hip_both_vel_max",
+      "label": "Hip swing (both legs averaged) \u2014 fastest movement",
+      "sentence": "How far the thigh swings forward and back (both legs averaged): the quickest the joint angle changes.",
+      "unit": "degrees/s",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_both_acc_mean": {
+      "feature": "kin_hip_both_acc_mean",
+      "label": "Hip swing (both legs averaged) \u2014 average smoothness",
+      "sentence": "How far the thigh swings forward and back (both legs averaged): how sharply the joint changes direction on average.",
+      "unit": "degrees/s\u00b2",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_both_acc_max": {
+      "feature": "kin_hip_both_acc_max",
+      "label": "Hip swing (both legs averaged) \u2014 sharpest change",
+      "sentence": "How far the thigh swings forward and back (both legs averaged): the sharpest direction change in the joint.",
+      "unit": "degrees/s\u00b2",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_hip_both_cv": {
+      "feature": "kin_hip_both_cv",
+      "label": "Hip swing (both legs averaged) \u2014 relative variability",
+      "sentence": "How far the thigh swings forward and back (both legs averaged): variation measured relative to the average.",
+      "unit": "ratio",
+      "high_means": "more swing",
+      "low_means": "less swing"
+    },
+    "kin_ankle_L_mean": {
+      "feature": "kin_ankle_L_mean",
+      "label": "Ankle angle (left) \u2014 average",
+      "sentence": "How far the foot pivots at the ankle (left): the average angle held through the walk.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_L_min": {
+      "feature": "kin_ankle_L_min",
+      "label": "Ankle angle (left) \u2014 straightest point",
+      "sentence": "How far the foot pivots at the ankle (left): the most extended the joint gets.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_L_max": {
+      "feature": "kin_ankle_L_max",
+      "label": "Ankle angle (left) \u2014 most bent point",
+      "sentence": "How far the foot pivots at the ankle (left): the most flexed the joint gets.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_L_rom": {
+      "feature": "kin_ankle_L_rom",
+      "label": "Ankle angle (left) \u2014 range of movement",
+      "sentence": "How far the foot pivots at the ankle (left): the total sweep from straightest to most bent.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_L_p05": {
+      "feature": "kin_ankle_L_p05",
+      "label": "Ankle angle (left) \u2014 low end",
+      "sentence": "How far the foot pivots at the ankle (left): the angle at the bottom 5% of the walk.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_L_p95": {
+      "feature": "kin_ankle_L_p95",
+      "label": "Ankle angle (left) \u2014 high end",
+      "sentence": "How far the foot pivots at the ankle (left): the angle at the top 5% of the walk.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_L_iqr": {
+      "feature": "kin_ankle_L_iqr",
+      "label": "Ankle angle (left) \u2014 middle spread",
+      "sentence": "How far the foot pivots at the ankle (left): the spread of the middle half of the angles.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_R_mean": {
+      "feature": "kin_ankle_R_mean",
+      "label": "Ankle angle (right) \u2014 average",
+      "sentence": "How far the foot pivots at the ankle (right): the average angle held through the walk.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_R_min": {
+      "feature": "kin_ankle_R_min",
+      "label": "Ankle angle (right) \u2014 straightest point",
+      "sentence": "How far the foot pivots at the ankle (right): the most extended the joint gets.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_R_p05": {
+      "feature": "kin_ankle_R_p05",
+      "label": "Ankle angle (right) \u2014 low end",
+      "sentence": "How far the foot pivots at the ankle (right): the angle at the bottom 5% of the walk.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_R_iqr": {
+      "feature": "kin_ankle_R_iqr",
+      "label": "Ankle angle (right) \u2014 middle spread",
+      "sentence": "How far the foot pivots at the ankle (right): the spread of the middle half of the angles.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_both_mean": {
+      "feature": "kin_ankle_both_mean",
+      "label": "Ankle angle (both legs averaged) \u2014 average",
+      "sentence": "How far the foot pivots at the ankle (both legs averaged): the average angle held through the walk.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_both_std": {
+      "feature": "kin_ankle_both_std",
+      "label": "Ankle angle (both legs averaged) \u2014 steadiness",
+      "sentence": "How far the foot pivots at the ankle (both legs averaged): how much the angle varies from stride to stride.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_both_min": {
+      "feature": "kin_ankle_both_min",
+      "label": "Ankle angle (both legs averaged) \u2014 straightest point",
+      "sentence": "How far the foot pivots at the ankle (both legs averaged): the most extended the joint gets.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_both_max": {
+      "feature": "kin_ankle_both_max",
+      "label": "Ankle angle (both legs averaged) \u2014 most bent point",
+      "sentence": "How far the foot pivots at the ankle (both legs averaged): the most flexed the joint gets.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_both_p05": {
+      "feature": "kin_ankle_both_p05",
+      "label": "Ankle angle (both legs averaged) \u2014 low end",
+      "sentence": "How far the foot pivots at the ankle (both legs averaged): the angle at the bottom 5% of the walk.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_both_p95": {
+      "feature": "kin_ankle_both_p95",
+      "label": "Ankle angle (both legs averaged) \u2014 high end",
+      "sentence": "How far the foot pivots at the ankle (both legs averaged): the angle at the top 5% of the walk.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_both_iqr": {
+      "feature": "kin_ankle_both_iqr",
+      "label": "Ankle angle (both legs averaged) \u2014 middle spread",
+      "sentence": "How far the foot pivots at the ankle (both legs averaged): the spread of the middle half of the angles.",
+      "unit": "degrees",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_ankle_both_cv": {
+      "feature": "kin_ankle_both_cv",
+      "label": "Ankle angle (both legs averaged) \u2014 relative variability",
+      "sentence": "How far the foot pivots at the ankle (both legs averaged): variation measured relative to the average.",
+      "unit": "ratio",
+      "high_means": "more angle",
+      "low_means": "less angle"
+    },
+    "kin_trunk_mean": {
+      "feature": "kin_trunk_mean",
+      "label": "Trunk lean \u2014 average",
+      "sentence": "How far the upper body tips away from upright: the average angle held through the walk.",
+      "unit": "degrees",
+      "high_means": "the person leans, often to unload a painful knee",
+      "low_means": "an upright, unguarded posture"
+    },
+    "kin_trunk_std": {
+      "feature": "kin_trunk_std",
+      "label": "Trunk lean \u2014 steadiness",
+      "sentence": "How far the upper body tips away from upright: how much the angle varies from stride to stride.",
+      "unit": "degrees",
+      "high_means": "an unsteady upper body",
+      "low_means": "a steady upper body"
+    },
+    "kin_trunk_min": {
+      "feature": "kin_trunk_min",
+      "label": "Trunk lean \u2014 straightest point",
+      "sentence": "How far the upper body tips away from upright: the most extended the joint gets.",
+      "unit": "degrees",
+      "high_means": "more lean",
+      "low_means": "less lean"
+    },
+    "kin_trunk_max": {
+      "feature": "kin_trunk_max",
+      "label": "Trunk lean \u2014 most bent point",
+      "sentence": "How far the upper body tips away from upright: the most flexed the joint gets.",
+      "unit": "degrees",
+      "high_means": "more lean",
+      "low_means": "less lean"
+    },
+    "kin_trunk_rom": {
+      "feature": "kin_trunk_rom",
+      "label": "Trunk lean \u2014 range of movement",
+      "sentence": "How far the upper body tips away from upright: the total sweep from straightest to most bent.",
+      "unit": "degrees",
+      "high_means": "more lean",
+      "low_means": "less lean"
+    },
+    "kin_trunk_p05": {
+      "feature": "kin_trunk_p05",
+      "label": "Trunk lean \u2014 low end",
+      "sentence": "How far the upper body tips away from upright: the angle at the bottom 5% of the walk.",
+      "unit": "degrees",
+      "high_means": "more lean",
+      "low_means": "less lean"
+    },
+    "kin_trunk_p95": {
+      "feature": "kin_trunk_p95",
+      "label": "Trunk lean \u2014 high end",
+      "sentence": "How far the upper body tips away from upright: the angle at the top 5% of the walk.",
+      "unit": "degrees",
+      "high_means": "more lean",
+      "low_means": "less lean"
+    },
+    "kin_trunk_iqr": {
+      "feature": "kin_trunk_iqr",
+      "label": "Trunk lean \u2014 middle spread",
+      "sentence": "How far the upper body tips away from upright: the spread of the middle half of the angles.",
+      "unit": "degrees",
+      "high_means": "more lean",
+      "low_means": "less lean"
+    },
+    "kin_trunk_vel_mean": {
+      "feature": "kin_trunk_vel_mean",
+      "label": "Trunk lean \u2014 average speed of movement",
+      "sentence": "How far the upper body tips away from upright: how quickly the joint angle changes on average.",
+      "unit": "degrees/s",
+      "high_means": "more lean",
+      "low_means": "less lean"
+    },
+    "kin_trunk_vel_max": {
+      "feature": "kin_trunk_vel_max",
+      "label": "Trunk lean \u2014 fastest movement",
+      "sentence": "How far the upper body tips away from upright: the quickest the joint angle changes.",
+      "unit": "degrees/s",
+      "high_means": "more lean",
+      "low_means": "less lean"
+    },
+    "kin_trunk_acc_mean": {
+      "feature": "kin_trunk_acc_mean",
+      "label": "Trunk lean \u2014 average smoothness",
+      "sentence": "How far the upper body tips away from upright: how sharply the joint changes direction on average.",
+      "unit": "degrees/s\u00b2",
+      "high_means": "more lean",
+      "low_means": "less lean"
+    },
+    "kin_trunk_acc_max": {
+      "feature": "kin_trunk_acc_max",
+      "label": "Trunk lean \u2014 sharpest change",
+      "sentence": "How far the upper body tips away from upright: the sharpest direction change in the joint.",
+      "unit": "degrees/s\u00b2",
+      "high_means": "more lean",
+      "low_means": "less lean"
+    },
+    "kin_trunk_cv": {
+      "feature": "kin_trunk_cv",
+      "label": "Trunk lean \u2014 relative variability",
+      "sentence": "How far the upper body tips away from upright: variation measured relative to the average.",
+      "unit": "ratio",
+      "high_means": "more lean",
+      "low_means": "less lean"
+    },
+    "asym_knee_rom": {
+      "label": "Knee range difference, left vs right",
+      "sentence": "How differently the two knees move. Healthy walking is close to symmetric; one-sided OA is not.",
+      "unit": "degrees",
+      "high_means": "one knee is doing much less work than the other",
+      "low_means": "both knees move alike",
+      "feature": "asym_knee_rom"
+    },
+    "asym_knee_mean": {
+      "feature": "asym_knee_mean",
+      "label": "Left-right difference in knee bend \u2014 average",
+      "sentence": "How different the two sides are in how far the knee flexes and straightens (average). Healthy walking is close to symmetric.",
+      "unit": "degrees",
+      "high_means": "the two sides move differently",
+      "low_means": "the two sides move alike"
+    },
+    "asym_knee_max": {
+      "feature": "asym_knee_max",
+      "label": "Left-right difference in knee bend \u2014 most bent point",
+      "sentence": "How different the two sides are in how far the knee flexes and straightens (most bent point). Healthy walking is close to symmetric.",
+      "unit": "degrees",
+      "high_means": "the two sides move differently",
+      "low_means": "the two sides move alike"
+    },
+    "asym_knee_min": {
+      "feature": "asym_knee_min",
+      "label": "Left-right difference in knee bend \u2014 straightest point",
+      "sentence": "How different the two sides are in how far the knee flexes and straightens (straightest point). Healthy walking is close to symmetric.",
+      "unit": "degrees",
+      "high_means": "the two sides move differently",
+      "low_means": "the two sides move alike"
+    },
+    "asym_knee_corr": {
+      "label": "Left-right knee coordination",
+      "sentence": "How closely the two knee-angle traces mirror each other through the walk.",
+      "unit": "correlation",
+      "high_means": "the legs move in a coordinated pattern",
+      "low_means": "the legs have fallen out of step with each other",
+      "feature": "asym_knee_corr"
+    },
+    "asym_hip_rom": {
+      "feature": "asym_hip_rom",
+      "label": "Left-right difference in hip swing \u2014 range of movement",
+      "sentence": "How different the two sides are in how far the thigh swings forward and back (range of movement). Healthy walking is close to symmetric.",
+      "unit": "degrees",
+      "high_means": "the two sides move differently",
+      "low_means": "the two sides move alike"
+    },
+    "asym_hip_mean": {
+      "feature": "asym_hip_mean",
+      "label": "Left-right difference in hip swing \u2014 average",
+      "sentence": "How different the two sides are in how far the thigh swings forward and back (average). Healthy walking is close to symmetric.",
+      "unit": "degrees",
+      "high_means": "the two sides move differently",
+      "low_means": "the two sides move alike"
+    },
+    "asym_hip_max": {
+      "feature": "asym_hip_max",
+      "label": "Left-right difference in hip swing \u2014 most bent point",
+      "sentence": "How different the two sides are in how far the thigh swings forward and back (most bent point). Healthy walking is close to symmetric.",
+      "unit": "degrees",
+      "high_means": "the two sides move differently",
+      "low_means": "the two sides move alike"
+    },
+    "asym_hip_min": {
+      "feature": "asym_hip_min",
+      "label": "Left-right difference in hip swing \u2014 straightest point",
+      "sentence": "How different the two sides are in how far the thigh swings forward and back (straightest point). Healthy walking is close to symmetric.",
+      "unit": "degrees",
+      "high_means": "the two sides move differently",
+      "low_means": "the two sides move alike"
+    },
+    "asym_hip_corr": {
+      "feature": "asym_hip_corr",
+      "label": "Left-right difference in hip swing \u2014 corr",
+      "sentence": "How different the two sides are in how far the thigh swings forward and back (corr). Healthy walking is close to symmetric.",
+      "unit": "degrees",
+      "high_means": "the two sides move differently",
+      "low_means": "the two sides move alike"
+    },
+    "asym_ankle_rom": {
+      "feature": "asym_ankle_rom",
+      "label": "Left-right difference in ankle angle \u2014 range of movement",
+      "sentence": "How different the two sides are in how far the foot pivots at the ankle (range of movement). Healthy walking is close to symmetric.",
+      "unit": "degrees",
+      "high_means": "the two sides move differently",
+      "low_means": "the two sides move alike"
+    },
+    "asym_ankle_mean": {
+      "feature": "asym_ankle_mean",
+      "label": "Left-right difference in ankle angle \u2014 average",
+      "sentence": "How different the two sides are in how far the foot pivots at the ankle (average). Healthy walking is close to symmetric.",
+      "unit": "degrees",
+      "high_means": "the two sides move differently",
+      "low_means": "the two sides move alike"
+    },
+    "asym_ankle_max": {
+      "feature": "asym_ankle_max",
+      "label": "Left-right difference in ankle angle \u2014 most bent point",
+      "sentence": "How different the two sides are in how far the foot pivots at the ankle (most bent point). Healthy walking is close to symmetric.",
+      "unit": "degrees",
+      "high_means": "the two sides move differently",
+      "low_means": "the two sides move alike"
+    },
+    "asym_ankle_min": {
+      "feature": "asym_ankle_min",
+      "label": "Left-right difference in ankle angle \u2014 straightest point",
+      "sentence": "How different the two sides are in how far the foot pivots at the ankle (straightest point). Healthy walking is close to symmetric.",
+      "unit": "degrees",
+      "high_means": "the two sides move differently",
+      "low_means": "the two sides move alike"
+    },
+    "asym_ankle_corr": {
+      "feature": "asym_ankle_corr",
+      "label": "Left-right difference in ankle angle \u2014 corr",
+      "sentence": "How different the two sides are in how far the foot pivots at the ankle (corr). Healthy walking is close to symmetric.",
+      "unit": "degrees",
+      "high_means": "the two sides move differently",
+      "low_means": "the two sides move alike"
+    },
+    "asym_knee_rom_ratio": {
+      "label": "Knee range ratio (worse / better)",
+      "sentence": "The worse knee's range divided by the better knee's. 1.0 is perfectly symmetric; lower means one knee is far stiffer.",
+      "unit": "ratio",
+      "high_means": "both knees move alike",
+      "low_means": "one knee is markedly stiffer than the other",
+      "feature": "asym_knee_rom_ratio"
+    },
+    "var_knee_L_sampen": {
+      "label": "Left knee stride predictability",
+      "sentence": "How repeatable the left knee's bending pattern is from stride to stride.",
+      "unit": "index",
+      "high_means": "the knee pattern wanders between strides",
+      "low_means": "the knee repeats the same pattern each stride",
+      "feature": "var_knee_L_sampen"
+    },
+    "var_knee_R_sampen": {
+      "label": "Right knee stride predictability",
+      "sentence": "How repeatable the right knee's bending pattern is from stride to stride.",
+      "unit": "index",
+      "high_means": "the knee pattern wanders between strides",
+      "low_means": "the knee repeats the same pattern each stride",
+      "feature": "var_knee_R_sampen"
+    },
+    "var_ankle_sep_sampen": {
+      "label": "Stride predictability",
+      "sentence": "Sample entropy of the stride pattern \u2014 low means each stride closely repeats the last, high means the pattern wanders.",
+      "unit": "index",
+      "high_means": "strides vary unpredictably",
+      "low_means": "strides repeat closely",
+      "feature": "var_ankle_sep_sampen"
+    }
+  },
+  "top_terms": [
+    [
+      "var_ankle_sep_sampen",
+      0.021692384430311965
+    ],
+    [
+      "kin_knee_both_acc_max",
+      0.020156077337628687
+    ],
+    [
+      "kin_knee_L_mean",
+      0.018528319684441016
+    ],
+    [
+      "asym_ankle_min",
+      0.01433432966168764
+    ],
+    [
+      "kin_knee_R_p05",
+      0.014300400362931285
+    ],
+    [
+      "kin_ankle_both_min",
+      0.01330995681637364
+    ],
+    [
+      "kin_ankle_both_max",
+      0.01308936832825197
+    ],
+    [
+      "kin_ankle_R_mean",
+      0.012828397698146
+    ],
+    [
+      "asym_ankle_rom",
+      0.012820343474917064
+    ],
+    [
+      "kin_knee_R_min",
+      0.012689715794541099
+    ],
+    [
+      "kin_ankle_both_p05",
+      0.012246931739863763
+    ],
+    [
+      "asym_knee_corr",
+      0.0114753094032837
+    ]
+  ]
+}

@@ -1,16 +1,17 @@
-fastapi==0.141.1
-uvicorn==0.52.4
-python-multipart==0.0.32
+fastapi
+uvicorn
+python-multipart
 
-numpy==2.5.2
-pandas==3.0.5
-scipy==1.18.1
-scikit-learn==1.7.2
-joblib==1.5.3
+numpy
+pandas
+scipy
+scikit-learn
+joblib
 
-opencv-python==5.0.0.93
-mediapipe==0.10.35
+opencv-python
+mediapipe
 
-reportlab==5.0.1
+reportlab
 
-interpret==0.7.8
+interpret
+torch

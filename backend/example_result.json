@@ -1,0 +1,184 @@
+{
+  "tag": "Fusion + EBM",
+  "role": "primary",
+  "protocol": "3-seed 5-fold subject CV",
+  "acc": 0.9479166666666666,
+  "auc": 0.9850694444444444,
+  "prec": 0.9296788482834994,
+  "rec": 0.9916666666666667,
+  "f1": 0.9596434518562053,
+  "f2": 0.97859662813572,
+  "spec": 0.875,
+  "acc_std": 0.00736569563735987,
+  "auc_std": 0.0017704928866641625,
+  "prec_std": 0.0007830639880249485,
+  "rec_std": 0.011785113019775804,
+  "f1_std": 0.005956624858658367,
+  "f2_std": 0.009369230952657947,
+  "spec_std": 0.0,
+  "per_seed_auc": [
+    0.9875,
+    0.9833333333333334,
+    0.984375
+  ],
+  "per_seed_acc": [
+    0.9375,
+    0.953125,
+    0.953125
+  ],
+  "cm": [
+    [
+      5,
+      1
+    ],
+    [
+      0,
+      10
+    ]
+  ],
+  "w_handcrafted": 0.6,
+  "gcn_variant": "cfnet",
+  "speed_corr": -0.9147280509270591,
+  "component_auc": {
+    "handcrafted": 0.98125,
+    "graph": 0.9822916666666667
+  },
+  "ebm_fidelity": 0.9962547331323632,
+  "ebm_top_terms": [
+    [
+      "var_ankle_sep_sampen",
+      0.021692384430311965,
+      "Stride predictability"
+    ],
+    [
+      "kin_knee_both_acc_max",
+      0.020156077337628687,
+      "Knee bend (both legs averaged) \u2014 sharpest change"
+    ],
+    [
+      "kin_knee_L_mean",
+      0.018528319684441016,
+      "Knee bend (left) \u2014 average"
+    ],
+    [
+      "asym_ankle_min",
+      0.01433432966168764,
+      "Left-right difference in ankle angle \u2014 straightest point"
+    ],
+    [
+      "kin_knee_R_p05",
+      0.014300400362931285,
+      "Knee bend (right) \u2014 low end"
+    ],
+    [
+      "kin_ankle_both_min",
+      0.01330995681637364,
+      "Ankle angle (both legs averaged) \u2014 straightest point"
+    ],
+    [
+      "kin_ankle_both_max",
+      0.01308936832825197,
+      "Ankle angle (both legs averaged) \u2014 most bent point"
+    ],
+    [
+      "kin_ankle_R_mean",
+      0.012828397698146,
+      "Ankle angle (right) \u2014 average"
+    ],
+    [
+      "asym_ankle_rom",
+      0.012820343474917064,
+      "Left-right difference in ankle angle \u2014 range of movement"
+    ],
+    [
+      "kin_knee_R_min",
+      0.012689715794541099,
+      "Knee bend (right) \u2014 straightest point"
+    ],
+    [
+      "kin_ankle_both_p05",
+      0.012246931739863763,
+      "Ankle angle (both legs averaged) \u2014 low end"
+    ],
+    [
+      "asym_knee_corr",
+      0.0114753094032837,
+      "Left-right knee coordination"
+    ]
+  ],
+  "holdout": {
+    "acc": 0.9375,
+    "auc": 0.9833333333333334,
+    "prec": 0.9090909090909091,
+    "rec": 1.0,
+    "f1": 0.9523809523809523,
+    "f2": 0.9803921568627451,
+    "spec": 0.8333333333333334,
+    "cm": [
+      [
+        5,
+        1
+      ],
+      [
+        0,
+        10
+      ]
+    ]
+  },
+  "holdout_predictions": {
+    "subject": [
+      "KOA_EA_001",
+      "KOA_EA_006",
+      "KOA_EA_013",
+      "KOA_MO_001",
+      "KOA_MO_002",
+      "KOA_MO_007",
+      "KOA_MO_012",
+      "KOA_SE_002",
+      "KOA_SE_003",
+      "KOA_SE_015",
+      "NM_008",
+      "NM_010",
+      "NM_012",
+      "NM_019",
+      "NM_022",
+      "NM_027"
+    ],
+    "prob": [
+      0.8435549842793604,
+      0.775089479239031,
+      0.7877024037409437,
+      0.5890092214617659,
+      0.7644181727478738,
+      0.8472809667816408,
+      0.8015321763336978,
+      0.8756401087627653,
+      0.927934506519733,
+      0.8891946254026425,
+      0.6140772742763356,
+      0.48657676070633155,
+      0.41283744183961923,
+      0.2743162876179744,
+      0.13038246673477333,
+      0.18153053338755368
+    ],
+    "y": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  }
+}
