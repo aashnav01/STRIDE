@@ -1,4 +1,5 @@
 import csv
+import gc
 import cv2
 import mediapipe as mp
 import os
@@ -29,12 +30,14 @@ TARGET_FPS = 25.0
 # mid-request (the KOA model holds ~242 MB and MediaPipe's heavy pose
 # runtime adds ~170 MB on top).
 #
-# 300 is the largest count VERIFIED to complete on the deployed instance
-# (12s of 720p, ~55s, no crash). 400 was an interpolation between a passing
-# and a failing case and was never confirmed, so this uses the measured
-# number instead of the guessed one. It is still more than twice the ~144
-# frames the model samples, and 12 seconds of walking at 25 fps.
-MAX_ANALYSIS_FRAMES = 300
+# Even at 300 the deployed instance peaked at 563 MB on a 512 MB plan and
+# dropped the connection mid-request. Each iteration decodes a full-
+# resolution frame (a 1080p frame is ~6 MB, 4K ~24 MB) and churning buffers
+# that size fragments the heap faster than Python returns it.
+#
+# 200 frames is 8 seconds at 25 fps. The model samples 3 windows of 48
+# frames, which linspace places at 0/76/152 — comfortably inside 200.
+MAX_ANALYSIS_FRAMES = 200
 
 
 JOINTS = [
@@ -193,7 +196,10 @@ def extract_pose(video_path, output_csv=None):
 
                 height, width = frame.shape[:2]
 
-                MAX_WIDTH = 640
+                # MediaPipe resizes to its own 256px input internally, so
+                # a smaller working frame costs little accuracy and much
+                # less allocation churn per iteration.
+                MAX_WIDTH = 512
 
                 if width > MAX_WIDTH:
 
@@ -232,6 +238,15 @@ def extract_pose(video_path, output_csv=None):
                     image,
                     timestamp_ms
                 )
+
+                # release the full-resolution decode and the RGB copy as
+                # soon as MediaPipe is done with them
+                del frame, rgb, image
+
+                # large numpy buffers churned at speed fragment the heap;
+                # collecting periodically keeps RSS from ratcheting upward
+                if frames_processed % 25 == 0:
+                    gc.collect()
 
                 row = {
                     "frame": frames_processed,
