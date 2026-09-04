@@ -22,9 +22,15 @@ TARGET_FPS = 25.0
 # yet extraction previously ran over EVERY frame of the clip. A two-minute
 # video is ~3000 frames and took minutes of pose detection to produce a
 # score that needed a fraction of it, which is what made long uploads time
-# out. 750 frames is 30 seconds of walking at 25 fps: far more than the
-# model consumes, and it bounds the worst case to roughly 90 seconds.
-MAX_ANALYSIS_FRAMES = 750
+# out.
+#
+# The ceiling is memory, not time. Measured on Render's 512 MB free
+# instance: 300 frames completes in ~55s, 750 frames gets OOM-killed
+# mid-request (the KOA model holds ~242 MB and MediaPipe's heavy pose
+# runtime adds ~170 MB on top). 400 frames is 16 seconds of walking at
+# 25 fps — still nearly three times the ~144 frames the model samples —
+# and stays well inside the envelope that has actually been tested.
+MAX_ANALYSIS_FRAMES = 400
 
 
 JOINTS = [
