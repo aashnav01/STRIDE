@@ -37,7 +37,11 @@ TARGET_FPS = 25.0
 #
 # 200 frames is 8 seconds at 25 fps. The model samples 3 windows of 48
 # frames, which linspace places at 0/76/152 — comfortably inside 200.
-MAX_ANALYSIS_FRAMES = 200
+# Constrained by default for a 512 MB host. On a laptop there is no reason
+# to throttle: set MAX_ANALYSIS_FRAMES=0 for no cap and MAX_WIDTH=1280 for
+# full-resolution landmarks.
+MAX_ANALYSIS_FRAMES = int(os.environ.get("MAX_ANALYSIS_FRAMES", "200"))
+_MAX_WIDTH = int(os.environ.get("MAX_WIDTH", "512"))
 
 
 JOINTS = [
@@ -156,7 +160,7 @@ def extract_pose(video_path, output_csv=None):
 
             while True:
 
-                if frames_processed >= MAX_ANALYSIS_FRAMES:
+                if MAX_ANALYSIS_FRAMES and frames_processed >= MAX_ANALYSIS_FRAMES:
                     # enough signal for every window the model needs
                     truncated = True
                     print(
@@ -199,7 +203,7 @@ def extract_pose(video_path, output_csv=None):
                 # MediaPipe resizes to its own 256px input internally, so
                 # a smaller working frame costs little accuracy and much
                 # less allocation churn per iteration.
-                MAX_WIDTH = 512
+                MAX_WIDTH = _MAX_WIDTH
 
                 if width > MAX_WIDTH:
 

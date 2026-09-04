@@ -50,8 +50,14 @@ Type is set in **Tiro Bangla** (a Bengali/Latin serif on traditional letterforms
 cd backend
 python -m venv venv && venv/Scripts/activate    # or: source venv/bin/activate
 pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
+
+# no frame cap and full-resolution landmarks — a laptop has the memory
+MAX_ANALYSIS_FRAMES=0 MAX_WIDTH=1280 uvicorn main:app --reload --port 8000
 ```
+
+`MAX_ANALYSIS_FRAMES` (200) and `MAX_WIDTH` (512) default to values that fit
+a 512 MB host. They exist only for constrained deployments; locally there is
+no reason to throttle, and the analysis runs roughly ten times faster.
 
 **Frontend**
 
