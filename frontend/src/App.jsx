@@ -24,13 +24,24 @@ import './App.css'
 // bundle. If it is unset in a production build the app will call
 // localhost and fail, so say so loudly rather than failing at DNS.
 const RAW_API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
-if (import.meta.env.PROD && !import.meta.env.VITE_API_URL) {
-  console.error(
-    '[config] VITE_API_URL was not set at build time. Set it on the ' +
-    'frontend service and redeploy — a restart will not rebuild the bundle.'
-  )
-}
 const API_URL = /^https?:\/\//.test(RAW_API) ? RAW_API : `https://${RAW_API}`
+
+if (import.meta.env.PROD) {
+  const host = API_URL.replace(/^https?:\/\//, '').split('/')[0]
+  if (!import.meta.env.VITE_API_URL) {
+    console.error(
+      '[config] VITE_API_URL was not set at build time. Set it on the ' +
+      'frontend service and redeploy — a restart will not rebuild the bundle.'
+    )
+  } else if (!host.includes('.')) {
+    // a bare service name has no domain and will never resolve
+    console.error(
+      `[config] VITE_API_URL is "${import.meta.env.VITE_API_URL}", which is a ` +
+      'bare hostname with no domain. Use the full public URL, e.g. ' +
+      'https://your-service.onrender.com'
+    )
+  }
+}
 
 const PROGRESS_STEP_COUNT = 4     // labels live in WalkProgress, translated
 const PROGRESS_STEP_MS = 7500

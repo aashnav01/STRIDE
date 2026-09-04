@@ -51,7 +51,9 @@ before going further. Nothing else will work.
 VITE_API_URL = https://<your-backend>.onrender.com
 ```
 
-Include `https://`. Then **Manual Deploy → Deploy latest commit**.
+Use the **full public URL** — scheme, service name and `.onrender.com`.
+A bare service name such as `stride-backend-ifu4` has no domain and will
+never resolve from a browser. Then **Manual Deploy → Deploy latest commit**.
 
 > This variable is read by Vite at **build** time and baked into the bundle.
 > Restarting is not enough — it must rebuild, or the old value stays compiled in.
@@ -74,7 +76,8 @@ Open the frontend and start a screening. If a request fails, check in order:
 
 | Symptom | Cause |
 |---|---|
-| `ERR_NAME_NOT_RESOLVED` | `VITE_API_URL` wrong or missing `https://` — and remember it needs a **rebuild** |
+| `ERR_NAME_NOT_RESOLVED`, host has no dot | `VITE_API_URL` is a bare service name; it needs the full `.onrender.com` URL |
+| `ERR_NAME_NOT_RESOLVED`, host looks right | Points at a service that no longer exists, or the bundle was not rebuilt |
 | CORS error in console | `ALLOWED_ORIGINS` does not exactly match the frontend origin |
 | 500, `model_loaded: false` | Model failed to load; see the build log |
 | First request hangs ~50 s | Free instance waking from sleep — this is normal |
