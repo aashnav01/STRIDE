@@ -5,7 +5,10 @@ import { pendingScreenings, listScreenings, markSynced } from '../lib/db'
 import { useOnline } from '../lib/useOnline'
 import { useReducedMotion } from '../lib/motion'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+// Render's fromService supplies a bare hostname with no scheme; without
+// this the value would be treated as a relative path by fetch().
+const RAW_API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_URL = /^https?:\/\//.test(RAW_API) ? RAW_API : `https://${RAW_API}`
 
 /*
  * The moment a day in the field lands.

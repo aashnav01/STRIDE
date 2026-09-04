@@ -20,7 +20,10 @@ import ReferralCard from './components/ReferralCard'
 import WhyNER from './components/WhyNER'
 import './App.css'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+// Render's fromService supplies a bare hostname with no scheme; without
+// this the value would be treated as a relative path by fetch().
+const RAW_API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_URL = /^https?:\/\//.test(RAW_API) ? RAW_API : `https://${RAW_API}`
 
 const PROGRESS_STEP_COUNT = 4     // labels live in WalkProgress, translated
 const PROGRESS_STEP_MS = 7500

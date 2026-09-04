@@ -6,7 +6,10 @@ import { useLanguage } from '../i18n/useLanguage'
 import { listScreenings, pendingScreenings, syncPending } from '../lib/db'
 import { useOnline } from '../lib/useOnline'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+// Render's fromService supplies a bare hostname with no scheme; without
+// this the value would be treated as a relative path by fetch().
+const RAW_API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_URL = /^https?:\/\//.test(RAW_API) ? RAW_API : `https://${RAW_API}`
 
 /* Bands are STATUS, not categorical: fixed meaning, never reused as series
    colors, and always carried by an icon + label as well as the hue — amber

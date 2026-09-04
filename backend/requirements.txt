@@ -1,18 +1,24 @@
-fastapi
-uvicorn
-python-multipart
+# Pinned deliberately. The models are pickled artefacts — an unpinned
+# scikit-learn means Render installs whatever is newest at build time, and
+# sklearn itself warns that a version skew "may lead to breaking code or
+# invalid results". For a screening tool that is not an acceptable risk.
 
-numpy
-pandas
-scipy
-scikit-learn
-joblib
+fastapi==0.141.1
+uvicorn==0.52.4
+python-multipart==0.0.32
 
-opencv-python-headless
-mediapipe
+numpy==2.2.6
+pandas==2.3.3
+scipy==1.15.3
+scikit-learn==1.7.2
+joblib==1.5.3
 
-reportlab
+opencv-python-headless==5.0.0.93
+mediapipe==1.0.1
 
-interpret
+reportlab==5.0.1
+
+interpret==0.7.8
+
 # torch is intentionally omitted — the graph stream (koa_stgcn) is disabled
 # (use_graph=False) and torch adds ~800 MB to the image for no gain.

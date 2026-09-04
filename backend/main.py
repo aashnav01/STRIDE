@@ -59,17 +59,38 @@ app = FastAPI(
 # CORS
 # ============================================================
 
+# Origins come from the environment so a redeploy to a new host does not
+# need a code change. ALLOWED_ORIGINS is a comma-separated list; local dev
+# ports are always permitted.
+_DEV_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:4173",      # vite preview, where the service worker runs
+]
+def _as_origin(value: str) -> str:
+    """Render hands over a bare hostname; CORS needs a scheme to match."""
+    value = value.strip()
+    if not value:
+        return ""
+    return value if value.startswith(("http://", "https://")) else f"https://{value}"
+
+
+_env_origins = [
+    o for o in (
+        _as_origin(v)
+        for v in os.environ.get("ALLOWED_ORIGINS", "").split(",")
+    ) if o
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-      "http://localhost:5173",
-      "http://127.0.0.1:5173",
-      "https://koa-frontend-o8um.onrender.com",
-    ],
+    allow_origins=_DEV_ORIGINS + _env_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+print("CORS origins:", _DEV_ORIGINS + _env_origins)
 
 
 # ============================================================

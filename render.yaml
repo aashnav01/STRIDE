@@ -1,17 +1,66 @@
+# Render Blueprint for Stride.
+#
+# The frontend's API host and the backend's allowed origin are wired to each
+# other with fromService, so neither carries a hardcoded hostname and a
+# rename cannot silently break CORS. Render supplies a bare hostname with no
+# scheme, so both ends prepend https:// when one is missing.
+#
+# PERSISTENCE — read this before demoing:
+# Render's filesystem is ephemeral. On the free plan the screening database
+# is wiped by every deploy, restart, and sleep/wake cycle. The app is
+# offline-first, so each phone keeps its own copy in IndexedDB and nothing
+# is lost on the device — but the server-side dashboard resets.
+# To make it durable, switch the backend to `plan: starter` and uncomment
+# the disk block. Disks are not available on the free plan.
+
 services:
   - type: web
-    name: koa-backend
+    name: stride-backend
     runtime: python
     rootDir: backend
+    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    # disk:                       # requires plan: starter or above
+    #   name: stride-data
+    #   mountPath: /var/data
+    #   sizeGB: 1
+    envVars:
+      # with a disk attached, point this at /var/data/screenings.db
+      - key: SCREENINGS_DB
+        value: /tmp/screenings.db
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: ALLOWED_ORIGINS
+        fromService:
+          name: stride-frontend
+          type: web
+          property: host
 
   - type: web
-    name: koa-frontend
+    name: stride-frontend
     runtime: static
     rootDir: frontend
-    buildCommand: npm install && npm run build
+    buildCommand: npm ci && npm run build
     staticPublishPath: ./dist
     envVars:
       - key: VITE_API_URL
-        value: https://koa-backend-ygct.onrender.com
+        fromService:
+          name: stride-backend
+          type: web
+          property: host
+    routes:
+      # single-page app: unmatched paths resolve to the shell
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      # the service worker must never be cached, or an old shell pins
+      # itself on the device and the app stops updating
+      - path: /sw.js
+        name: Cache-Control
+        value: no-cache, no-store, must-revalidate
+      - path: /manifest.webmanifest
+        name: Cache-Control
+        value: no-cache
