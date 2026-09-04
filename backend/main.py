@@ -6,6 +6,7 @@ import os
 import sys
 import uuid
 import time
+import gc
 from io import BytesIO
 from datetime import datetime
 
@@ -112,23 +113,61 @@ print("=" * 60)
 print("Loading KOA model...")
 print("=" * 60)
 
-try:
-    screener = KOAScreener(
-        MODEL_DIR,
-        use_graph=False
-    )
+# The KOA model holds ~242 MB. MediaPipe's pose runtime needs roughly
+# another 170 MB while extracting, and on a 512 MB instance holding both at
+# once is what gets the process OOM-killed mid-request.
+#
+# So the model is loaded on demand and released once a score is produced:
+# pose extraction runs with the model absent, and scoring runs with
+# MediaPipe already torn down. Peak becomes max(pose, model) instead of
+# their sum. The cost is ~10 s to reload per request, which is a good trade
+# against a 502.
+#
+# Set KEEP_MODEL_LOADED=1 on an instance with real headroom to skip this
+# and keep the model resident.
+KEEP_MODEL_LOADED = os.environ.get("KEEP_MODEL_LOADED") == "1"
 
-    print("KOA model loaded successfully")
-    print(f"Features       : {len(screener.features)}")
-    print(f"Window         : {screener.window}")
-    print(f"Windows/video  : {screener.windows_per_video}")
-    print(f"Severity model : {'loaded' if screener.severity else 'not loaded'}")
+screener = None
+_model_ok = None          # None = never tried, True/False = last outcome
 
-except Exception as e:
+
+def load_screener():
+    """Load the model, reusing it if it is already resident."""
+    global screener, _model_ok
+    if screener is not None:
+        return screener
+    try:
+        t = time.perf_counter()
+        screener = KOAScreener(MODEL_DIR, use_graph=False)
+        _model_ok = True
+        print(
+            f"KOA model loaded in {time.perf_counter() - t:.1f}s "
+            f"({len(screener.features)} features, window {screener.window}, "
+            f"severity {'yes' if screener.severity else 'no'})"
+        )
+    except Exception as e:
+        screener = None
+        _model_ok = False
+        print("KOA model failed to load:", type(e).__name__, e)
+    return screener
+
+
+def release_screener():
+    """Drop the model so pose extraction gets the memory back."""
+    global screener
+    if KEEP_MODEL_LOADED or screener is None:
+        return
     screener = None
+    gc.collect()
+    print("KOA model released")
 
-    print("KOA model failed to load")
-    print(type(e).__name__, e)
+
+# Load once at boot purely to prove the artefacts are readable, then let it
+# go. /health reports the outcome without pinning 242 MB for the lifetime
+# of the process.
+load_screener()
+if screener is not None and not KEEP_MODEL_LOADED:
+    release_screener()
 
 
 # ============================================================
@@ -142,7 +181,7 @@ def root():
     return {
         "status": "online",
         "service": "KOA Risk & Severity Prediction API",
-        "model_loaded": screener is not None,
+        "model_loaded": bool(_model_ok),
         "offline": True,
     }
 
@@ -192,8 +231,10 @@ def health():
     request, which otherwise looks identical to a timeout from the browser.
     """
     info = {
-        "status": "healthy" if screener is not None else "model_error",
-        "model_loaded": screener is not None,
+        "status": "healthy" if _model_ok else "model_error",
+        # whether the artefacts load, not whether they are resident right now
+        "model_loaded": bool(_model_ok),
+        "model_resident": screener is not None,
         "uptime_s": round(time.time() - _BOOTED_AT, 1),
     }
     try:
@@ -213,7 +254,7 @@ def health():
 @app.post("/extract-pose")
 async def extract_pose_endpoint(video: UploadFile = File(...)):
 
-    if screener is None:
+    if _model_ok is False:
         raise HTTPException(
             status_code=500,
             detail="KOA model is not loaded."
@@ -372,6 +413,14 @@ async def extract_pose_endpoint(video: UploadFile = File(...)):
         t_score = time.perf_counter()
         print("Running KOA model...")
 
+        # pose extraction is done; bring the model in now that MediaPipe has
+        # finished with its memory
+        if load_screener() is None:
+            raise HTTPException(
+                status_code=500,
+                detail="KOA model could not be loaded."
+            )
+
         result = screener.score_landmarks(
           csv_path
         )
@@ -452,6 +501,9 @@ async def extract_pose_endpoint(video: UploadFile = File(...)):
                     os.remove(path)
             except Exception:
                 pass
+
+        # give the 242 MB back so the next request's pose extraction has it
+        release_screener()
 
 
 # ============================================================
