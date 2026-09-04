@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Camera, Play, FileDown, Table, AlertTriangle, RotateCcw, CloudOff, Cloud, ChevronLeft } from 'lucide-react'
 import { useLanguage } from './i18n/useLanguage'
 import LanguageSwitcher from './components/LanguageSwitcher'
@@ -10,6 +10,7 @@ import AppBackground from './components/AppBackground'
 import { Kingkhap } from './components/Gamosa'
 import WalkProgress from './components/WalkProgress'
 import SyncPanel from './components/SyncPanel'
+import DiagPanel from './components/DiagPanel'
 import { useCountUp } from './lib/motion'
 import Guidance from './components/Guidance'
 import { saveScreening, syncPending } from './lib/db'
@@ -59,6 +60,8 @@ function App() {
   const [analyzing, setAnalyzing] = useState(false)
   const [progressStep, setProgressStep] = useState(0)
   const [slow, setSlow] = useState(false)
+  const [diag, setDiag] = useState([])
+  const [diagOpen, setDiagOpen] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
   const [intake, setIntake] = useState({ patient: {}, symptoms: {} })
@@ -67,6 +70,18 @@ function App() {
   const [view, setView] = useState('home')
   const online = useOnline()
   useParallax()   // publishes --px/--py for the depth layers
+
+  /* every diagnostic line is timestamped from the start of the attempt and
+     mirrored to the console, so it is visible with or without devtools */
+  const diagStartRef = useRef(0)
+  const log = (msg, level) => {
+    const t = diagStartRef.current
+      ? `+${((Date.now() - diagStartRef.current) / 1000).toFixed(1)}s`
+      : '0.0s'
+    setDiag(d => [...d, { t, msg, level }])
+    if (level === 'err') console.error(`[diag ${t}] ${msg}`)
+    else console.info(`[diag ${t}] ${msg}`)
+  }
 
   /* ---------- flush the offline queue when a network appears ---------- */
   useEffect(() => {
@@ -108,8 +123,23 @@ function App() {
   const handleAnalyze = async () => {
     if (!selectedVideo) return
     setAnalyzing(true); setProgressStep(0); setSlow(false); setResult(null); setError(null)
+
+    diagStartRef.current = Date.now()
+    setDiag([])
+    setDiagOpen(true)
+    log(`POST ${API_URL}/extract-pose`)
+    log(`file: ${selectedVideo.name} · ${(selectedVideo.size / 1048576).toFixed(1)} MB · ${selectedVideo.type || 'unknown type'}`)
+    if (!import.meta.env.VITE_API_URL) log('VITE_API_URL is NOT set — using the localhost fallback', 'err')
+
     const formData = new FormData()
     formData.append('video', selectedVideo)
+
+    // a live heartbeat, so a pending request is visibly pending rather than
+    // silent; without this a hang produces no output at all
+    const beat = setInterval(() => {
+      const secs = ((Date.now() - diagStartRef.current) / 1000).toFixed(0)
+      log(`still waiting… ${secs}s elapsed, no response yet`)
+    }, 15000)
 
     // a request that will never return should say so rather than spin
     // forever; 4 min covers a cold start plus a long clip
@@ -123,7 +153,22 @@ function App() {
         body: formData,
         signal: controller.signal,
       })
-      const data = await response.json()
+      clearInterval(beat)
+      log(`HTTP ${response.status} ${response.statusText || ''}`.trim(),
+          response.ok ? undefined : 'err')
+
+      let data
+      try {
+        data = await response.json()
+      } catch {
+        const raw = await response.text().catch(() => '')
+        log(`response was not JSON (${raw.length} bytes). First 200: ${raw.slice(0, 200)}`, 'err')
+        throw new Error(
+          response.status === 502
+            ? 'The server restarted while analysing (502). This usually means it ran out of memory — try a shorter clip.'
+            : `Server returned ${response.status}`
+        )
+      }
 
       const roundTrip = ((performance.now() - startedAt) / 1000).toFixed(1)
       console.info(
@@ -139,8 +184,18 @@ function App() {
         console.info(`[timing] ${network}s outside the server — upload + cold start`)
       }
       if (!response.ok || !data.success) {
+        log(`rejected: ${data.detail || data.error || 'unknown reason'}`, 'err')
         // FastAPI HTTPException uses `detail`; keep `error` as a fallback.
         throw new Error(data.detail || data.error || 'Video analysis failed')
+      }
+      if (data.quality) {
+        log(`frames ${data.frames_detected}/${data.frames_processed} detected` +
+            `${data.quality.truncated ? ` (capped at ${data.quality.max_analysis_frames})` : ''}` +
+            ` · knee visibility ${data.quality.mean_knee_visibility}`)
+      }
+      if (data.timings) {
+        const T = data.timings
+        log(`server: upload ${T.upload_s}s · pose ${T.pose_s}s (${T.ms_per_frame} ms/frame) · score ${T.score_s}s · total ${T.total_s}s`)
       }
       setResult(data)
 
@@ -157,16 +212,22 @@ function App() {
       setSavedId(row.id)
       syncPending(API_URL).catch(() => {})
     } catch (err) {
+      clearInterval(beat)
       if (err.name === 'AbortError') {
-        console.error('[timing] aborted after 240s with no response')
+        log('ABORTED after 240s with no response from the server', 'err')
         setError(
           'The server did not respond in four minutes. It may still be ' +
           'starting up, or the video may be too long. Try a shorter clip.'
         )
       } else {
+        log(`${err.name}: ${err.message}`, 'err')
+        if (err.name === 'TypeError') {
+          log('a TypeError here is usually CORS, DNS, or the server dropping the connection', 'err')
+        }
         setError(err.message || 'Could not connect to the backend.')
       }
     } finally {
+      clearInterval(beat)
       clearTimeout(timeoutId)
       setAnalyzing(false)
     }
@@ -302,6 +363,12 @@ function App() {
           </button>
 
           {analyzing && <WalkProgress step={progressStep} slow={slow} />}
+
+          <DiagPanel
+            lines={diag}
+            open={diagOpen}
+            onToggle={() => setDiagOpen(o => !o)}
+          />
 
           {error && (
             <div className="error-message">

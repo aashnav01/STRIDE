@@ -2096,3 +2096,43 @@ html[data-lang="mni"] .why-ner > p:first-of-type::first-letter {
   color: var(--text-muted);
   animation: riseIn 0.4s ease both;
 }
+
+/* =====================================================================
+   DIAGNOSTICS — on screen, because console output is invisible to
+   someone without devtools open and says nothing while a request hangs
+   ===================================================================== */
+.diag {
+  margin-top: 18px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.diag-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 8px 10px;
+}
+.diag-toggle, .diag-copy {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: none; border: none; cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.04em;
+  color: var(--text-muted);
+  padding: 4px 6px; border-radius: 6px;
+}
+.diag-toggle:hover, .diag-copy:hover { color: var(--primary); background: var(--surface); }
+.diag-body {
+  margin: 0; padding: 10px 12px 14px;
+  border-top: 1px solid var(--border);
+  background: #0F172A;
+  color: #CBD5E1;
+  font-family: var(--font-mono);
+  font-size: 11.5px; line-height: 1.75;
+  max-height: 260px; overflow: auto;
+  white-space: pre-wrap; word-break: break-word;
+}
+.diag-t {
+  display: inline-block; min-width: 62px;
+  color: #64748B;
+}
+.diag-err { color: #FCA5A5; }
