@@ -5,6 +5,7 @@ from fastapi.responses import Response
 import os
 import sys
 import uuid
+import time
 from io import BytesIO
 from datetime import datetime
 
@@ -177,12 +178,30 @@ def get_summary():
     return store.summary()
 
 
+_BOOTED_AT = time.time()
+
+
 @app.get("/health")
 def health():
-    return {
+    """Diagnostics for a slow or failing deploy.
+
+    `uptime_s` resetting between requests means the process restarted —
+    on a memory-limited host that usually means it was OOM-killed mid
+    request, which otherwise looks identical to a timeout from the browser.
+    """
+    info = {
         "status": "healthy" if screener is not None else "model_error",
         "model_loaded": screener is not None,
+        "uptime_s": round(time.time() - _BOOTED_AT, 1),
     }
+    try:
+        import resource
+        # ru_maxrss is KB on Linux, bytes on macOS
+        peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        info["peak_rss_mb"] = round(peak / 1024, 1)
+    except Exception:
+        pass
+    return info
 
 
 # ============================================================
@@ -228,6 +247,9 @@ async def extract_pose_endpoint(video: UploadFile = File(...)):
     # Create temporary filenames
     # --------------------------------------------------------
 
+    t0 = time.perf_counter()
+    timings = {}
+
     file_id = str(uuid.uuid4())
 
     video_path = os.path.join(
@@ -264,7 +286,9 @@ async def extract_pose_endpoint(video: UploadFile = File(...)):
 
                 f.write(chunk)
 
-        print("Video saved")
+        timings["upload_s"] = round(time.perf_counter() - t0, 2)
+        print(f"Video saved ({timings['upload_s']}s)")
+        t_pose = time.perf_counter()
 
         # ----------------------------------------------------
         # MediaPipe pose extraction
@@ -277,8 +301,19 @@ async def extract_pose_endpoint(video: UploadFile = File(...)):
             csv_path
         )
 
+        timings["pose_s"] = round(time.perf_counter() - t_pose, 2)
+
         frames_processed = pose_stats["frames_processed"]
         frames_detected = pose_stats["frames_detected"]
+
+        if frames_processed:
+            timings["ms_per_frame"] = round(
+                timings["pose_s"] * 1000 / frames_processed, 1
+            )
+        print(
+            f"Pose extraction: {timings['pose_s']}s for {frames_processed} frames"
+            f" ({timings.get('ms_per_frame')} ms/frame)"
+        )
 
         print(
            f"Pose extraction complete: "
@@ -332,13 +367,20 @@ async def extract_pose_endpoint(video: UploadFile = File(...)):
         # KOA prediction
         # ----------------------------------------------------
 
+        t_score = time.perf_counter()
         print("Running KOA model...")
 
         result = screener.score_landmarks(
           csv_path
         )
 
-        print("KOA prediction complete")
+        timings["score_s"] = round(time.perf_counter() - t_score, 2)
+        timings["total_s"] = round(time.perf_counter() - t0, 2)
+        print(f"KOA prediction complete ({timings['score_s']}s)")
+        print(
+            "TIMING  upload=%(upload_s)ss  pose=%(pose_s)ss  "
+            "score=%(score_s)ss  TOTAL=%(total_s)ss" % timings
+        )
 
         print(
             f"Risk  : {result.get('risk')}"
@@ -371,6 +413,9 @@ async def extract_pose_endpoint(video: UploadFile = File(...)):
             },
             "csv_available": os.path.exists(csv_path),
             "prediction": result,
+            # where the time actually went, so a slow request is diagnosable
+            # from the browser without reading server logs
+            "timings": timings,
         }
 
     except HTTPException:

@@ -110,9 +110,34 @@ function App() {
     setAnalyzing(true); setProgressStep(0); setSlow(false); setResult(null); setError(null)
     const formData = new FormData()
     formData.append('video', selectedVideo)
+
+    // a request that will never return should say so rather than spin
+    // forever; 4 min covers a cold start plus a long clip
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 240000)
+    const startedAt = performance.now()
+
     try {
-      const response = await fetch(`${API_URL}/extract-pose`, { method: 'POST', body: formData })
+      const response = await fetch(`${API_URL}/extract-pose`, {
+        method: 'POST',
+        body: formData,
+        signal: controller.signal,
+      })
       const data = await response.json()
+
+      const roundTrip = ((performance.now() - startedAt) / 1000).toFixed(1)
+      console.info(
+        `[timing] round trip ${roundTrip}s`,
+        data.timings
+          ? `| server: upload ${data.timings.upload_s}s, pose ${data.timings.pose_s}s ` +
+            `(${data.timings.ms_per_frame} ms/frame), score ${data.timings.score_s}s, ` +
+            `total ${data.timings.total_s}s`
+          : '| server sent no timings'
+      )
+      if (data.timings) {
+        const network = (roundTrip - data.timings.total_s).toFixed(1)
+        console.info(`[timing] ${network}s outside the server — upload + cold start`)
+      }
       if (!response.ok || !data.success) {
         // FastAPI HTTPException uses `detail`; keep `error` as a fallback.
         throw new Error(data.detail || data.error || 'Video analysis failed')
@@ -132,8 +157,17 @@ function App() {
       setSavedId(row.id)
       syncPending(API_URL).catch(() => {})
     } catch (err) {
-      setError(err.message || 'Could not connect to the backend.')
+      if (err.name === 'AbortError') {
+        console.error('[timing] aborted after 240s with no response')
+        setError(
+          'The server did not respond in four minutes. It may still be ' +
+          'starting up, or the video may be too long. Try a shorter clip.'
+        )
+      } else {
+        setError(err.message || 'Could not connect to the backend.')
+      }
     } finally {
+      clearTimeout(timeoutId)
       setAnalyzing(false)
     }
   }

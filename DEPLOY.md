@@ -97,6 +97,32 @@ Open the frontend and start a screening. If a request fails, check in order:
 | 500, `libGLESv2.so.2: cannot open shared object file` | Backend is on the native Python runtime. MediaPipe needs system GL libraries — the service must use the Docker runtime (`runtime: docker` in `render.yaml`) |
 | First request hangs ~50 s | Free instance waking from sleep — this is normal |
 
+## Diagnosing a slow request
+
+Every analysis returns a `timings` block and logs it server-side. Open the
+browser console:
+
+```
+[timing] round trip 78.3s | server: upload 1.2s, pose 61.4s (245 ms/frame),
+         score 0.3s, total 62.9s
+[timing] 15.4s outside the server — upload + cold start
+```
+
+Read it as:
+
+| Observation | Meaning |
+|---|---|
+| `pose_s` dominates | Normal. MediaPipe runs on every frame |
+| `ms_per_frame` above ~200 | Slow shared CPU, or frames are not being downscaled |
+| Large gap between round trip and `total_s` | Cold start or a slow upload, not the model |
+| `score_s` above a second | Unexpected — inference should be milliseconds |
+| No response at all after 4 min | The client aborts and says so |
+
+`GET /health` reports `uptime_s` and `peak_rss_mb`. If `uptime_s` resets
+between requests the process restarted — on a 512 MB instance that almost
+always means it was OOM-killed mid-request, which from the browser is
+indistinguishable from a timeout.
+
 ## Before a demo
 
 - **Open `/health` a minute beforehand.** Free instances sleep after 15
