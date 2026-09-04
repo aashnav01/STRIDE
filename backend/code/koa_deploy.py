@@ -17,6 +17,11 @@ koa_deploy.py — one function for the frontend.
         "confidence": "within one grade 98.7% of the time in validation"
       },
       "confidence": "moderate",
+      "worse_knee_side": "left",          # which knee is more affected, or None
+      "worse_knee": {                     # headline callout for the UI
+        "side": "left", "ratio": 0.62,
+        "reading": "The left knee moves through only 0.62 of the better knee's range."
+      },
       "n_windows": 3,
       "measurements": [                  # what was measured, in plain English
         {"label": "Knee bend (left) — range of movement",
@@ -97,7 +102,24 @@ class KOAScreener:
             sl = slice(s, min(s + w, n))
             rows.append({**KF.window_features(sig, fps=self.fps, sl=sl),
                          **KF.duration_features(sig, self.fps)})
-        return rows
+        return rows, sig
+
+    @staticmethod
+    def _worse_knee_side(sig) -> str | None:
+        """Which knee is more affected, by range of movement.
+
+        koa_features computes worse/better ROM but discards the side, and the
+        deployed feature list has no per-side ROM pair to recover it from — so
+        read it straight off the signals.
+        """
+        kL = np.asarray(sig["knee_left"], dtype=float)
+        kR = np.asarray(sig["knee_right"], dtype=float)
+        kL, kR = kL[np.isfinite(kL)], kR[np.isfinite(kR)]
+        if len(kL) <= 4 or len(kR) <= 4:
+            return None
+        romL, romR = kL.max() - kL.min(), kR.max() - kR.min()
+        # smaller range = stiffer = the more affected knee
+        return "left" if romL < romR else "right"
 
     def _graph_prob(self, csv_path):
         if self.graph is None:
@@ -165,7 +187,7 @@ class KOAScreener:
 
     # -- public --------------------------------------------------------------
     def score_landmarks(self, csv_path) -> dict:
-        rows = self._windows(csv_path)
+        rows, sig = self._windows(csv_path)
         import pandas as pd
         df = pd.DataFrame(rows)
         X = self.imputer.transform(df.reindex(columns=self.features)
@@ -182,6 +204,26 @@ class KOAScreener:
 
         band = next(name for hi, name in BANDS if risk < hi)
         vals = dict(zip(self.features, np.nanmedian(X, axis=0)))
+
+        worse_knee_side = self._worse_knee_side(sig)
+        worse_knee = None
+        if worse_knee_side:
+            # asym_knee_rom_ratio is the worse/better comparison the deployed
+            # feature list actually carries; use it for the headline reading.
+            ratio = vals.get("asym_knee_rom_ratio")
+            ratio = (None if ratio is None or not np.isfinite(ratio)
+                     else round(float(ratio), 2))
+            if ratio is None:
+                reading = (f"The {worse_knee_side} knee moves through the "
+                           "smaller range of the two.")
+            elif ratio >= 0.9:
+                reading = (f"The {worse_knee_side} knee is the more limited of "
+                           f"the two, but the sides are close ({ratio} of "
+                           "the better knee's range).")
+            else:
+                reading = (f"The {worse_knee_side} knee moves through only "
+                           f"{ratio} of the better knee's range.")
+            worse_knee = dict(side=worse_knee_side, ratio=ratio, reading=reading)
 
         reasons, measurements = [], []
         if self.ebm is not None:
@@ -204,6 +246,7 @@ class KOAScreener:
 
         return dict(
             risk=round(risk, 3), band=band, stage=self._stage(df),
+            worse_knee_side=worse_knee_side, worse_knee=worse_knee,
             components=dict(handcrafted=round(p_hc, 3),
                             graph=(None if p_gcn is None else round(p_gcn, 3)),
                             mix=mix),
@@ -224,9 +267,9 @@ class KOAScreener:
 
     def score_video(self, mp4_path, out_csv=None) -> dict:
         """Convenience: MP4 -> landmarks -> score. Needs mediapipe installed."""
-        import extract_pose
+        import pose_extractor as extract_pose
         out_csv = out_csv or (str(mp4_path) + ".csv")
-        extract_pose.extract(mp4_path, out_csv)
+        extract_pose.extract_pose(mp4_path, out_csv)
         return self.score_landmarks(out_csv)
 
 

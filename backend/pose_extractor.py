@@ -11,6 +11,12 @@ MODEL_PATH = os.path.join(
 )
 
 
+# The model was trained at 25 fps. Cadence, velocity and duration features
+# scale with fps, so a 30/60 fps phone clip must be resampled or the numbers
+# come out wrong. See BUILD_SPEC.md §8.
+TARGET_FPS = 25.0
+
+
 JOINTS = [
     "left_shoulder",
     "right_shoulder",
@@ -43,7 +49,13 @@ MP_INDEX = {
 }
 
 
+# Knee visibility values, indexed into the pose landmark list.
+_KNEE_INDICES = (MP_INDEX["left_knee"], MP_INDEX["right_knee"])
+
+
 def extract_pose(video_path, output_csv=None):
+    """Run MediaPipe on a video, write a landmark CSV at 25 fps, and return
+    quality stats the API layer uses to gate bad captures."""
 
     cap = cv2.VideoCapture(video_path)
 
@@ -52,10 +64,15 @@ def extract_pose(video_path, output_csv=None):
             f"Could not open video: {video_path}"
         )
 
-    fps = cap.get(cv2.CAP_PROP_FPS)
+    src_fps = cap.get(cv2.CAP_PROP_FPS)
 
-    if fps <= 0:
-        fps = 30.0
+    if not src_fps or src_fps <= 0:
+        src_fps = 30.0
+
+    # Which source-frame indices we want to keep to approximate 25 fps.
+    # We walk the video sequentially and pick a frame when its timestamp
+    # passes the next target tick.
+    frame_interval = src_fps / TARGET_FPS
 
     fieldnames = [
         "frame",
@@ -90,8 +107,13 @@ def extract_pose(video_path, output_csv=None):
 
         writer.writeheader()
 
-    frames_processed = 0
-    frames_detected = 0
+    frames_processed = 0     # frames actually written to the CSV (post-resample)
+    frames_detected = 0      # of those, how many had a pose
+    src_frames_read = 0      # frames read from the source video
+    knee_vis_sum = 0.0
+    knee_vis_count = 0
+
+    next_target_index = 0.0
 
     options = mp.tasks.vision.PoseLandmarkerOptions(
         base_options=mp.tasks.BaseOptions(
@@ -113,6 +135,20 @@ def extract_pose(video_path, output_csv=None):
 
                 if not success:
                     break
+
+                # ------------------------------------------------
+                # Resample to TARGET_FPS by skipping source frames.
+                # If the video is slower than 25 fps we just take
+                # every frame (no interpolation — we can't invent
+                # frames from nothing).
+                # ------------------------------------------------
+
+                if src_frames_read < next_target_index and src_fps > TARGET_FPS:
+                    src_frames_read += 1
+                    continue
+
+                next_target_index += frame_interval
+                src_frames_read += 1
 
                 if frames_processed % 10 == 0:
                     print(
@@ -155,8 +191,10 @@ def extract_pose(video_path, output_csv=None):
                     data=rgb
                 )
 
+                # Timestamp uses the resampled clock so the model sees a
+                # monotonically increasing series at ~40 ms per step.
                 timestamp_ms = int(
-                    (frames_processed / fps) * 1000
+                    (frames_processed / TARGET_FPS) * 1000
                 )
 
                 result = landmarker.detect_for_video(
@@ -180,6 +218,10 @@ def extract_pose(video_path, output_csv=None):
 
                     row["detected"] = 1
                     frames_detected += 1
+
+                    for k in _KNEE_INDICES:
+                        knee_vis_sum += float(pose[k].visibility)
+                        knee_vis_count += 1
 
                     for joint in JOINTS:
 
@@ -211,8 +253,23 @@ def extract_pose(video_path, output_csv=None):
         if csv_file:
             csv_file.close()
 
+    duration_s = frames_processed / TARGET_FPS if frames_processed else 0.0
+
+    detection_rate = (
+        frames_detected / frames_processed if frames_processed else 0.0
+    )
+
+    mean_knee_visibility = (
+        knee_vis_sum / knee_vis_count if knee_vis_count else 0.0
+    )
+
     print(
         f"CSV written: {output_csv}",
+        flush=True
+    )
+
+    print(
+        f"Source fps: {src_fps:.1f} -> resampled to {TARGET_FPS:.0f} fps",
         flush=True
     )
 
@@ -222,11 +279,22 @@ def extract_pose(video_path, output_csv=None):
     )
 
     print(
-        f"Frames detected: {frames_detected}",
+        f"Frames detected: {frames_detected} "
+        f"(rate {detection_rate:.2f})",
+        flush=True
+    )
+
+    print(
+        f"Mean knee visibility: {mean_knee_visibility:.2f}",
         flush=True
     )
 
     return {
         "frames_processed": frames_processed,
-        "frames_detected": frames_detected
+        "frames_detected": frames_detected,
+        "duration_s": round(duration_s, 2),
+        "detection_rate": round(detection_rate, 3),
+        "mean_knee_visibility": round(mean_knee_visibility, 3),
+        "source_fps": round(src_fps, 2),
+        "target_fps": TARGET_FPS,
     }

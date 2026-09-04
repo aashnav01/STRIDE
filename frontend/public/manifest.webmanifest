@@ -1,0 +1,20 @@
+{
+  "name": "Stride — OA Screening",
+  "short_name": "Stride",
+  "description": "AI-assisted osteoarthritis screening for health workers in the North Eastern Region. Works offline.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F8FAFC",
+  "theme_color": "#4F46E5",
+  "lang": "en-IN",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

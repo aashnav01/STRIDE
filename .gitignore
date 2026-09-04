@@ -6,3 +6,28 @@ backend/uploads/*
 *.env
 .vscode/
 .idea/
+frontend/dist/
+frontend/node_modules/
+
+# Patient records — never commit a screening database
+backend/screenings.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Extracted pose landmarks are derived from real people's walking videos
+backend/uploads/
+*.csv
+
+# Python
+__pycache__/
+*.pyo
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+
+# Local env files may carry real secrets; .env.production holds only a public URL
+.env.local
+.env.*.local

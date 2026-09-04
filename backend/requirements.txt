@@ -8,10 +8,11 @@ scipy
 scikit-learn
 joblib
 
-opencv-python
+opencv-python-headless
 mediapipe
 
 reportlab
 
 interpret
-torch
+# torch is intentionally omitted — the graph stream (koa_stgcn) is disabled
+# (use_graph=False) and torch adds ~800 MB to the image for no gain.

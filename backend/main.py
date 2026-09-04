@@ -41,6 +41,7 @@ if CODE_DIR not in sys.path:
 
 from pose_extractor import extract_pose
 from koa_deploy import KOAScreener
+import store
 
 
 # ============================================================
@@ -120,6 +121,39 @@ def root():
         "model_loaded": screener is not None,
         "offline": True,
     }
+
+
+@app.on_event("startup")
+def _init_store():
+    store.init_db()
+    print("Screening store ready")
+
+
+# ============================================================
+# Screening records — offline sync target for the field app
+# ============================================================
+
+@app.post("/screenings")
+async def create_screening(record: dict):
+    """Idempotent on the client-generated id, so a retried sync is safe."""
+    if not record.get("id"):
+        raise HTTPException(status_code=400, detail="screening id is required")
+    try:
+        store.upsert(record)
+        return {"success": True, "id": record["id"]}
+    except Exception as e:
+        print("screening store error:", type(e).__name__, e)
+        raise HTTPException(status_code=500, detail="Could not store screening")
+
+
+@app.get("/screenings")
+def get_screenings(limit: int = 500):
+    return {"screenings": store.list_screenings(limit)}
+
+
+@app.get("/screenings/summary")
+def get_summary():
+    return store.summary()
 
 
 @app.get("/health")
@@ -232,6 +266,48 @@ async def extract_pose_endpoint(video: UploadFile = File(...)):
         )
 
         # ----------------------------------------------------
+        # Quality gate — reject clips that will produce a
+        # meaningless score. Better to say no than to hand
+        # back a confident number from unusable footage.
+        # ----------------------------------------------------
+
+        duration_s = pose_stats.get("duration_s", 0.0)
+        detection_rate = pose_stats.get("detection_rate", 0.0)
+        mean_knee_visibility = pose_stats.get("mean_knee_visibility", 0.0)
+
+        quality_problems = []
+
+        if duration_s < 3.0:
+            quality_problems.append(
+                f"Clip is only {duration_s:.1f} s long. "
+                "Please record at least 4 seconds of walking."
+            )
+
+        if detection_rate < 0.8:
+            quality_problems.append(
+                f"A pose was detected in only "
+                f"{detection_rate * 100:.0f}% of frames. "
+                "Please film with the whole body in frame."
+            )
+
+        if mean_knee_visibility < 0.4:
+            quality_problems.append(
+                f"Knee visibility averaged "
+                f"{mean_knee_visibility:.2f}. "
+                "Please film side-on with the knees clearly visible."
+            )
+
+        if quality_problems:
+            print("Quality gate rejected clip:")
+            for problem in quality_problems:
+                print(f"  - {problem}")
+
+            raise HTTPException(
+                status_code=422,
+                detail=" ".join(quality_problems),
+            )
+
+        # ----------------------------------------------------
         # KOA prediction
         # ----------------------------------------------------
 
@@ -265,9 +341,20 @@ async def extract_pose_endpoint(video: UploadFile = File(...)):
             "filename": video.filename,
             "frames_processed": frames_processed,
             "frames_detected": frames_detected,
+            "quality": {
+                "duration_s": duration_s,
+                "detection_rate": detection_rate,
+                "mean_knee_visibility": mean_knee_visibility,
+                "source_fps": pose_stats.get("source_fps"),
+                "target_fps": pose_stats.get("target_fps"),
+            },
             "csv_available": os.path.exists(csv_path),
             "prediction": result,
         }
+
+    except HTTPException:
+        # 422s from the quality gate should reach the client as-is.
+        raise
 
     except Exception as e:
 
@@ -283,25 +370,16 @@ async def extract_pose_endpoint(video: UploadFile = File(...)):
     finally:
 
         # ----------------------------------------------------
-        # Remove temporary video
+        # Remove temporary files. Render's disk is ephemeral
+        # but a busy demo still fills it up between restarts.
         # ----------------------------------------------------
 
-        try:
-            if os.path.exists(video_path):
-                os.remove(video_path)
-        except Exception:
-            pass
-
-        # ----------------------------------------------------
-        # Keep CSV temporarily for now
-        # ----------------------------------------------------
-        #
-        # We will later decide whether the CSV should:
-        # 1. download directly
-        # 2. remain locally
-        # 3. be included in the PDF
-        #
-        # ----------------------------------------------------
+        for path in (video_path, csv_path):
+            try:
+                if os.path.exists(path):
+                    os.remove(path)
+            except Exception:
+                pass
 
 
 # ============================================================
@@ -457,7 +535,7 @@ async def generate_report(data: dict):
             canvas.drawRightString(
                 A4[0] - 15 * mm,
                 7 * mm,
-                f"page {doc.page} of 1"
+                f"page {doc.page}"
             )
 
             canvas.restoreState()
@@ -713,7 +791,10 @@ async def generate_report(data: dict):
             )
         )
 
-        if stage:
+        # Severity staging is defined *within* diagnosed OA, so a "moderate"
+        # grade on a low-risk subject reads as a false positive. The UI hides
+        # it for the low band; the PDF must agree or the bug just moves here.
+        if stage and str(band).lower() != "low":
 
             grade = safe(
                 stage.get("grade")
@@ -817,6 +898,17 @@ async def generate_report(data: dict):
 
             story.append(
                 probability_table
+            )
+
+        elif stage:
+
+            story.append(
+                Paragraph(
+                    "Severity staging is not reported at this risk level. "
+                    "Staging is defined within diagnosed knee OA, so it is "
+                    "not meaningful for a low-risk screening result.",
+                    normal_style
+                )
             )
 
         else:
@@ -1019,7 +1111,30 @@ async def generate_report(data: dict):
             )
         )
 
-        clip_length = "Not available"
+        quality = data.get("quality", {})
+
+        duration_s = quality.get("duration_s")
+        detection_rate = quality.get("detection_rate")
+        mean_knee_visibility = quality.get("mean_knee_visibility")
+
+        clip_length = (
+            f"{duration_s:.1f} s"
+            if isinstance(duration_s, (int, float))
+            else "—"
+        )
+
+        detection_cell = (
+            f"{frames_detected}/{frames_processed} "
+            f"({detection_rate * 100:.0f}%)"
+            if isinstance(detection_rate, (int, float))
+            else f"{frames_detected}/{frames_processed}"
+        )
+
+        knee_vis_cell = (
+            f"{mean_knee_visibility:.2f}"
+            if isinstance(mean_knee_visibility, (int, float))
+            else "—"
+        )
 
         quality_data = [
             [
@@ -1031,8 +1146,8 @@ async def generate_report(data: dict):
             ],
             [
                 clip_length,
-                f"{frames_detected}/{frames_processed}",
-                "See measurements",
+                detection_cell,
+                knee_vis_cell,
                 safe(prediction.get("n_windows", "—")),
                 "KOA screener",
             ],

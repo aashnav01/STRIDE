@@ -1,73 +1,44 @@
-﻿/* =====================================================================
-   COLOR TOKENS — Light Mode (default)
-   Light: #6367FF (primary), #C9BEFF (soft purple), #FFDBFD (blush pink)
+/* =====================================================================
+   COLOR TOKENS
    ===================================================================== */
 :root {
-  --bg:           #f7f6ff;
-  --bg-2:         #eee9ff;
-  --surface:      rgba(255,255,255,0.65);
-  --surface-2:    rgba(255,255,255,0.40);
-  --border:       rgba(99,103,255,0.15);
-  --border-strong:rgba(99,103,255,0.35);
+  --bg:           #F8FAFC;
+  --bg-2:         #F1F5F9;
+  --surface:      #FFFFFF;
+  --surface-2:    #F1F5F9;
+  --border:       rgba(15,23,42,0.08);
+  --border-strong:rgba(15,23,42,0.14);
 
-  --primary:      #6367FF;
-  --primary-glow: rgba(99,103,255,0.35);
-  --accent-1:     #C9BEFF;
-  --accent-2:     #FFDBFD;
+  --primary:      #4F46E5;   /* indigo-600 */
+  --primary-deep: #4338CA;   /* hover */
+  --primary-glow: rgba(79,70,229,0.20);
+  --violet:       #7C3AED;
+  --blue:         #2563EB;
+  --navy:         #1E3A8A;
 
-  --text-main:    #1a1640;
-  --text-sub:     #4a4780;
-  --text-muted:   #7b78a8;
-  --text-on-grad: #ffffff;
+  --text-main:    #0F172A;
+  --text-sub:     #334155;
+  --text-muted:   #64748B;
+  --text-on-primary: #ffffff;
 
   --success:      #059669;
-  --warning:      #d97706;
-  --danger:       #e11d48;
+  --warning:      #F59E0B;
+  --danger:       #DC2626;
 
-  --wave-1: rgba(99,103,255,0.30);
-  --wave-2: rgba(201,190,255,0.35);
-  --wave-3: rgba(255,219,253,0.40);
+  --shadow: 0 4px 16px rgba(15,23,42,0.06);
+  --shadow-lg: 0 12px 32px rgba(15,23,42,0.10);
 
-  --shadow: 0 8px 32px rgba(99,103,255,0.12);
-  --shadow-lg: 0 20px 60px rgba(99,103,255,0.18);
-
-  --radius: 20px;
-  --font: 'Inter', system-ui, -apple-system, sans-serif;
-}
-
-/* =====================================================================
-   Dark Mode
-   Dark: #19183B (bg), #708993 (muted), #A1C2BD (accent), #E7F2EF (light)
-   ===================================================================== */
-[data-theme="dark"] {
-  --bg:           #0e0d1f;
-  --bg-2:         #19183B;
-  --surface:      rgba(25,24,59,0.75);
-  --surface-2:    rgba(25,24,59,0.50);
-  --border:       rgba(161,194,189,0.12);
-  --border-strong:rgba(161,194,189,0.30);
-
-  --primary:      #A1C2BD;
-  --primary-glow: rgba(161,194,189,0.30);
-
-  --accent-1:     #708993;
-  --accent-2:     #E7F2EF;
-
-  --text-main:    #E7F2EF;
-  --text-sub:     #A1C2BD;
-  --text-muted:   #708993;
-  --text-on-grad: #E7F2EF;
-
-  --success:      #34d399;
-  --warning:      #fbbf24;
-  --danger:       #fb7185;
-
-  --wave-1: rgba(25,24,59,0.85);
-  --wave-2: rgba(112,137,147,0.25);
-  --wave-3: rgba(161,194,189,0.20);
-
-  --shadow: 0 8px 32px rgba(0,0,0,0.40);
-  --shadow-lg: 0 20px 60px rgba(0,0,0,0.55);
+  --radius: 16px;
+  /* Baloo Da 2 (Ek Type) — heavy, rounded, friendly. Warm rather than
+     corporate, and it carries Latin AND Bengali/Assamese in one family, so
+     the app looks like itself in every language.
+     Hind Siliguri — drawn for UI clarity and continuous reading in
+     Assamese. Both are Indian-designed, not Latin faces with Bengali
+     bolted on afterwards. */
+  --font-display: 'Baloo Da 2', 'Hind Siliguri', system-ui, sans-serif;
+  --font: 'Hind Siliguri', 'Baloo Da 2', system-ui, -apple-system, sans-serif;
+  --font-indic: 'Hind Siliguri', 'Baloo Da 2', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 }
 
 /* =====================================================================
@@ -82,65 +53,6 @@ body {
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
-  transition: background 0.5s ease, color 0.5s ease;
-}
-
-/* =====================================================================
-   ANIMATED BACKGROUND CANVAS
-   ===================================================================== */
-.bg-canvas {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-/* Fine dot grid */
-.bg-grid {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
-  background-size: 40px 40px;
-  opacity: 0.7;
-}
-
-/* Scanline texture */
-.scanlines {
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 3px,
-    rgba(0,0,0,0.03) 3px,
-    rgba(0,0,0,0.03) 4px
-  );
-}
-
-/* Pulse rings — emanate from top-left, very gentle */
-.pulse-ring {
-  position: absolute;
-  border-radius: 50%;
-  border: 1.5px solid var(--primary);
-  opacity: 0;
-  animation: ringPulse 7s ease-out infinite;
-}
-.pulse-ring-1 { width: 280px; height: 280px; top: -60px;  left: -60px;  border-color: var(--primary);  animation-delay: 0s; }
-.pulse-ring-2 { width: 460px; height: 460px; top: -130px; left: -130px; border-color: var(--accent-1); animation-delay: 2.3s; }
-.pulse-ring-3 { width: 640px; height: 640px; top: -200px; left: -200px; border-color: var(--accent-2); animation-delay: 4.6s; }
-
-@keyframes ringPulse {
-  0%   { transform: scale(0.6); opacity: 0.5; }
-  100% { transform: scale(1.0); opacity: 0; }
-}
-
-/* Wave layers — each is a full-width absolutely positioned SVG */
-.wave-layer {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  display: block;
 }
 
 /* =====================================================================
@@ -150,19 +62,15 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  position: relative;
-  z-index: 1;
 }
 
 /* =====================================================================
-   HEADER — frosted glass
+   HEADER
    ===================================================================== */
 .header {
   height: 72px;
   background: var(--surface);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border-strong);
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -171,7 +79,6 @@ body {
   top: 0;
   z-index: 200;
   box-shadow: var(--shadow);
-  transition: background 0.5s;
 }
 
 .logo {
@@ -182,29 +89,28 @@ body {
 
 .logo-icon {
   width: 44px; height: 44px;
-  border-radius: 14px;
+  border-radius: 12px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--primary), var(--accent-2));
-  color: var(--text-on-grad);
+  background: var(--primary);
+  color: var(--text-on-primary);
   font-weight: 900;
   font-size: 17px;
-  box-shadow: 0 4px 14px var(--primary-glow);
-  transition: box-shadow 0.3s;
 }
-.logo-icon:hover { box-shadow: 0 6px 24px var(--primary-glow); }
 
 .logo-text h2 {
+  font-family: var(--font-display);
   margin: 0;
   font-size: 19px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--text-main);
   letter-spacing: -0.3px;
 }
 .logo-text p {
   margin: 2px 0 0;
-  font-size: 11px;
+  font-size: 10.5px;
   color: var(--primary);
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -223,31 +129,6 @@ body {
   color: var(--text-muted);
 }
 
-/* Theme Toggle */
-.theme-toggle {
-  width: 52px; height: 28px;
-  background: var(--surface-2);
-  border: 1px solid var(--border-strong);
-  border-radius: 999px;
-  cursor: pointer;
-  position: relative;
-  transition: background 0.4s;
-  flex-shrink: 0;
-}
-.theme-toggle-knob {
-  position: absolute;
-  top: 3px; left: 3px;
-  width: 20px; height: 20px;
-  border-radius: 50%;
-  background: var(--primary);
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px;
-}
-[data-theme="dark"] .theme-toggle-knob {
-  transform: translateX(24px);
-}
-
 /* =====================================================================
    MAIN
    ===================================================================== */
@@ -255,22 +136,13 @@ body {
   flex: 1;
   width: min(1020px, 92%);
   margin: 0 auto;
-  padding: 70px 0 80px;
+  /* clears the cloth's top border, which sits at 64-180px */
+  padding: 122px 0 90px;
 }
 
 /* =====================================================================
-   HERO
+   BADGE
    ===================================================================== */
-.hero-section {
-  text-align: center;
-  margin-bottom: 56px;
-  animation: heroIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-@keyframes heroIn {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
 .badge {
   display: inline-flex;
   align-items: center;
@@ -284,82 +156,29 @@ body {
   font-weight: 700;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  margin-bottom: 28px;
-  box-shadow: 0 0 0 4px var(--primary-glow);
-  backdrop-filter: blur(8px);
+  margin-bottom: 24px;
 }
 .badge-dot {
   width: 8px; height: 8px;
   border-radius: 50%;
   background: var(--primary);
-  animation: pulse 2s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%,100% { opacity: 1; transform: scale(1); }
-  50%     { opacity: 0.4; transform: scale(0.6); }
-}
-
-.hero-section h1 {
-  font-size: clamp(38px, 6vw, 62px);
-  font-weight: 900;
-  letter-spacing: -2px;
-  line-height: 1.1;
-  margin: 0 0 22px;
-  color: var(--text-main);
-}
-.hero-section h1 .grad-text {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--accent-1) 50%, var(--accent-2) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-size: 300% auto;
-  animation: textShine 5s linear infinite;
-}
-@keyframes textShine {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.subtitle {
-  max-width: 580px;
-  margin: 0 auto;
-  font-size: 17px;
-  line-height: 1.7;
-  color: var(--text-sub);
 }
 
 /* =====================================================================
-   GLASS CARD BASE
+   CARD BASE
    ===================================================================== */
 .glass-card {
   background: var(--surface);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   position: relative;
   overflow: hidden;
-  transition: background 0.5s, box-shadow 0.3s;
-}
-/* top shimmer line */
-.glass-card::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent-1), var(--accent-2), transparent);
-  opacity: 0.6;
 }
 
 .upload-card {
   padding: 40px;
-  margin-bottom: 48px;
-  animation: cardIn 0.9s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-@keyframes cardIn {
-  from { opacity: 0; transform: translateY(30px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  margin-bottom: 40px;
 }
 
 /* =====================================================================
@@ -368,67 +187,48 @@ body {
 .upload-area {
   min-height: 260px;
   border: 2px dashed var(--border-strong);
-  border-radius: 16px;
+  border-radius: 14px;
   background: var(--surface-2);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 0.2s, background 0.2s;
   padding: 40px;
-  position: relative;
-  overflow: hidden;
-}
-.upload-area::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 50% 50%, var(--primary-glow), transparent 70%);
-  opacity: 0;
-  transition: opacity 0.4s;
 }
 .upload-area:hover {
   border-color: var(--primary);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px var(--primary-glow);
+  background: var(--bg-2);
 }
-.upload-area:hover::after { opacity: 1; }
 
 .upload-icon {
-  width: 70px; height: 70px;
+  width: 64px; height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--accent-2));
+  background: var(--primary);
+  color: var(--text-on-primary);
   display: flex; align-items: center; justify-content: center;
-  font-size: 30px;
   margin-bottom: 20px;
-  box-shadow: 0 6px 20px var(--primary-glow);
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  position: relative; z-index: 1;
 }
-.upload-area:hover .upload-icon { transform: scale(1.15) rotate(-5deg); }
 
 .upload-area h3 {
   margin: 0 0 10px;
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 700;
   color: var(--text-main);
-  position: relative; z-index: 1;
 }
 .upload-area p {
   margin: 0 0 18px;
   color: var(--text-sub);
-  font-size: 15px;
-  position: relative; z-index: 1;
+  font-size: 14px;
 }
 .file-types {
   font-size: 12px;
   color: var(--text-muted);
-  background: var(--surface-2);
+  background: var(--surface);
   padding: 6px 14px;
   border-radius: 999px;
   border: 1px solid var(--border);
-  position: relative; z-index: 1;
 }
 
 /* =====================================================================
@@ -438,9 +238,8 @@ body {
 
 .video-preview {
   width: 100%; max-height: 460px;
-  border-radius: 16px;
+  border-radius: 14px;
   background: #000;
-  box-shadow: var(--shadow-lg);
   border: 1px solid var(--border);
 }
 
@@ -451,9 +250,8 @@ body {
   gap: 16px;
   background: var(--surface-2);
   padding: 18px 22px;
-  border-radius: 16px;
-  border: 1px solid var(--border-strong);
-  backdrop-filter: blur(8px);
+  border-radius: 14px;
+  border: 1px solid var(--border);
 }
 .file-info-text h3 {
   margin: 0 0 4px;
@@ -470,273 +268,223 @@ body {
   border: 1px solid var(--border-strong);
   color: var(--text-main);
   padding: 10px 20px;
-  border-radius: 12px;
+  border-radius: 10px;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: border-color 0.2s;
   white-space: nowrap;
 }
-.change-video:hover {
-  background: var(--surface-2);
-  border-color: var(--primary);
-  box-shadow: 0 0 12px var(--primary-glow);
-}
+.change-video:hover { border-color: var(--primary); }
 .change-video input { display: none; }
 
 /* =====================================================================
-   ANALYZE BUTTON — chromatic gradient border + rainbow sweep
+   ANALYZE BUTTON
    ===================================================================== */
 .analyze-button {
   width: 100%;
-  margin-top: 30px;
-  padding: 18px;
+  margin-top: 28px;
+  padding: 16px;
   border: none;
-  border-radius: 16px;
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
   cursor: pointer;
-  position: relative;
-  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
-  color: #fff;
-  background: linear-gradient(120deg, var(--primary) 0%, var(--accent-1) 50%, var(--accent-2) 100%);
-  background-size: 250% auto;
-  animation: btnShine 4s linear infinite;
-  box-shadow: 0 8px 20px var(--primary-glow);
+  gap: 10px;
+  transition: background 0.2s;
+  color: var(--text-on-primary);
+  background: var(--primary);
 }
-@keyframes btnShine {
-  0%   { background-position: 0% 50%; }
-  100% { background-position: 250% 50%; }
-}
-.analyze-button:hover:not(:disabled) {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 16px 32px var(--primary-glow);
-}
+.analyze-button:hover:not(:disabled) { background: var(--primary-deep); }
 .analyze-button:disabled {
   background: var(--surface-2);
   color: var(--text-muted);
-  animation: none;
-  box-shadow: none;
   cursor: not-allowed;
   border: 1px solid var(--border);
 }
-.analyze-button::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transform: translateX(-100%);
-}
-.analyze-button:hover:not(:disabled)::after {
-  animation: btnGleam 0.7s ease forwards;
-}
-@keyframes btnGleam {
-  to { transform: translateX(100%); }
-}
-
-/* Spinner */
-.spinner {
-  width: 22px; height: 22px;
-  border: 3px solid rgba(255,255,255,0.2);
-  border-radius: 50%;
-  border-top-color: #fff;
-  animation: spin 0.7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
 
 /* =====================================================================
    RESULTS CARD
    ===================================================================== */
 .results-card {
   padding: 40px;
-  margin-bottom: 48px;
-  animation: resultIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  margin-bottom: 40px;
 }
-@keyframes resultIn {
-  from { opacity: 0; transform: scale(0.95) translateY(24px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
+
+.sticky-actions {
+  position: sticky;
+  top: 88px;
+  z-index: 10;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: -8px;
 }
 
 .report-header {
   text-align: center;
-  margin-bottom: 40px;
-  padding-bottom: 32px;
-  border-bottom: 1px solid var(--border-strong);
+  margin-bottom: 36px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border);
 }
 .report-header h2 {
+  font-family: var(--font-display);
   margin: 14px 0 10px;
-  font-size: 28px;
-  font-weight: 800;
+  font-size: 26px;
+  font-weight: 700;
   color: var(--text-main);
   letter-spacing: -0.5px;
 }
 .report-header p { color: var(--text-sub); margin: 0; font-size: 15px; }
 
 /* =====================================================================
-   DASHBOARD GRID — risk circle + severity card
+   DASHBOARD GRID — risk circle + worse knee / severity
    ===================================================================== */
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  margin-bottom: 40px;
+  gap: 20px;
+  margin-bottom: 36px;
 }
+.dashboard-grid.single { grid-template-columns: 1fr; }
+
 .metric-card {
   background: var(--surface-2);
-  border-radius: 18px;
-  border: 1px solid var(--border-strong);
-  padding: 32px 24px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 28px 24px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  transition: transform 0.3s, box-shadow 0.3s;
-  backdrop-filter: blur(8px);
-}
-.metric-card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-lg);
 }
 .metric-card h3 {
-  margin: 0 0 22px;
+  margin: 0 0 18px;
   font-size: 12px;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   font-weight: 700;
 }
 
-/* Spinning-gradient ring */
 .risk-ring-wrap {
   position: relative;
-  width: 150px; height: 150px;
-  margin-bottom: 20px;
-}
-.risk-ring-wrap::before {
-  content: "";
-  position: absolute;
-  inset: -4px;
+  width: 140px; height: 140px;
+  margin-bottom: 18px;
   border-radius: 50%;
-  background: conic-gradient(var(--primary), var(--accent-1), var(--accent-2), var(--primary));
-  animation: ringRotate 3s linear infinite;
+  border: 6px solid var(--border);
 }
-.risk-low    .risk-ring-wrap::before { background: conic-gradient(#059669, #34d399, #059669); }
-.risk-borderline .risk-ring-wrap::before { background: conic-gradient(#d97706, #fbbf24, #d97706); }
-.risk-elevated .risk-ring-wrap::before { background: conic-gradient(#e11d48, #fb7185, #e11d48); }
+.risk-low    .risk-ring-wrap { border-color: var(--success); }
+.risk-borderline .risk-ring-wrap { border-color: var(--warning); }
+.risk-elevated .risk-ring-wrap { border-color: var(--danger); }
 
-@keyframes ringRotate {
-  to { transform: rotate(360deg); }
-}
 .risk-circle {
+  font-family: var(--font-display);
   position: absolute;
-  inset: 4px;
+  inset: 0;
   border-radius: 50%;
-  background: var(--bg);
   display: flex; align-items: center; justify-content: center;
-  font-size: 34px;
-  font-weight: 900;
+  font-size: 30px;
+  font-weight: 800;
   color: var(--text-main);
 }
 
 .risk-band {
-  font-size: 16px; font-weight: 800;
+  font-size: 15px; font-weight: 700;
   text-transform: uppercase; letter-spacing: 1px;
 }
 .risk-low .risk-band     { color: var(--success); }
 .risk-borderline .risk-band { color: var(--warning); }
 .risk-elevated .risk-band   { color: var(--danger); }
 
-/* shadow glow under the ring card */
-.risk-low    .metric-card-inner { box-shadow: 0 0 30px rgba(5,150,105,0.15); }
-.risk-borderline .metric-card-inner { box-shadow: 0 0 30px rgba(217,119,6,0.15); }
-.risk-elevated .metric-card-inner { box-shadow: 0 0 30px rgba(225,29,72,0.15); }
+/* Worse knee callout */
+.worse-knee-card {
+  border-color: var(--navy);
+  background: rgba(30,58,138,0.04);
+}
+.worse-knee-side {
+  font-family: var(--font-display);
+  font-size: 26px; font-weight: 800;
+  text-transform: capitalize;
+  color: var(--navy);
+  margin-bottom: 10px;
+}
+.worse-knee-reading {
+  font-size: 13px;
+  color: var(--text-sub);
+  line-height: 1.6;
+  max-width: 220px;
+  margin: 0;
+}
 
 .severity-grade {
-  font-size: 34px; font-weight: 900;
+  font-family: var(--font-display);
+  font-size: 30px; font-weight: 800;
   color: var(--text-main);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   text-transform: capitalize;
 }
 .severity-conf {
   font-size: 13px;
   color: var(--text-sub);
   line-height: 1.6;
-  max-width: 200px;
+  max-width: 260px;
+  margin: 0;
 }
 
 /* =====================================================================
    MEASUREMENTS GRID
    ===================================================================== */
-.measurements { margin-bottom: 40px; }
+.measurements { margin-bottom: 36px; }
 .measurements h3 {
-  font-size: 19px; font-weight: 800;
-  margin: 0 0 24px;
+  font-family: var(--font-display);
+  font-size: 17px; font-weight: 700;
+  margin: 0 0 20px;
   color: var(--text-main);
   display: flex; align-items: center; gap: 12px;
 }
 .measurements h3::after {
   content: ""; flex: 1; height: 1px;
-  background: linear-gradient(90deg, var(--border-strong), transparent);
+  background: var(--border);
 }
 
 .measurement-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
 }
 .measurement {
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 22px;
+  border-radius: 12px;
+  padding: 18px;
   display: flex; flex-direction: column;
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative; overflow: hidden;
-  backdrop-filter: blur(8px);
 }
-.measurement::before {
-  content: "";
-  position: absolute;
-  left: 0; top: 0; width: 4px; height: 100%;
-  background: linear-gradient(180deg, var(--primary), var(--accent-2));
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.measurement:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--border-strong);
-}
-.measurement:hover::before { opacity: 1; }
 
 .measurement-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 .measurement-label {
-  font-weight: 700; font-size: 14px;
+  font-weight: 600; font-size: 13px;
   color: var(--text-main);
   line-height: 1.4;
 }
 .measurement-value {
-  background: linear-gradient(135deg, var(--primary), var(--accent-1));
-  color: #fff;
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-weight: 800; font-size: 13px;
+  background: var(--primary);
+  color: var(--text-on-primary);
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-weight: 700; font-size: 12px;
   white-space: nowrap;
-  box-shadow: 0 2px 8px var(--primary-glow);
 }
 .measurement-reading {
   font-size: 13px;
@@ -748,35 +496,40 @@ body {
    REPORT ACTIONS
    ===================================================================== */
 .report-actions {
-  display: flex; gap: 16px;
+  display: flex; gap: 14px;
   justify-content: center;
-  margin-top: 40px;
+  margin-top: 36px;
 }
 .download-button {
-  padding: 14px 30px;
+  padding: 12px 26px;
   background: var(--surface);
   border: 1px solid var(--border-strong);
-  border-radius: 14px;
-  font-weight: 700; font-size: 15px;
+  border-radius: 10px;
+  font-weight: 600; font-size: 14px;
   color: var(--text-main);
   cursor: pointer;
-  display: flex; align-items: center; gap: 10px;
-  transition: all 0.3s;
-  backdrop-filter: blur(8px);
+  display: flex; align-items: center; gap: 8px;
+  transition: border-color 0.2s, background 0.2s;
 }
 .download-button:hover {
-  background: var(--surface-2);
   border-color: var(--primary);
-  box-shadow: 0 8px 24px var(--primary-glow);
-  transform: translateY(-3px);
+  background: var(--surface-2);
+}
+.download-button.primary {
+  background: var(--primary);
+  color: var(--text-on-primary);
+  border-color: var(--primary);
+  box-shadow: var(--shadow);
+}
+.download-button.primary:hover {
+  background: var(--primary-deep);
 }
 
 .disclaimer {
   text-align: center;
   font-size: 13px;
   color: var(--text-muted);
-  margin-top: 30px;
-  opacity: 0.75;
+  margin-top: 26px;
 }
 
 /* =====================================================================
@@ -784,73 +537,13 @@ body {
    ===================================================================== */
 .error-message {
   margin-top: 20px;
-  padding: 16px 20px;
-  background: rgba(225, 29, 72, 0.08);
+  padding: 14px 18px;
+  background: rgba(220, 38, 38, 0.06);
   color: var(--danger);
-  border-radius: 14px;
-  border: 1px solid rgba(225, 29, 72, 0.25);
-  font-size: 15px; font-weight: 500;
-  display: flex; align-items: center; gap: 12px;
-  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-}
-@keyframes shake {
-  10%, 90% { transform: translateX(-2px); }
-  20%, 80% { transform: translateX(4px); }
-  30%, 50%, 70% { transform: translateX(-6px); }
-  40%, 60% { transform: translateX(6px); }
-}
-
-/* =====================================================================
-   HOW IT WORKS — STEPS
-   ===================================================================== */
-.steps-section {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 22px;
-}
-.step {
-  background: var(--surface);
-  border: 1px solid var(--border-strong);
-  padding: 28px 22px;
-  border-radius: var(--radius);
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
-  backdrop-filter: blur(12px);
-  position: relative; overflow: hidden;
-}
-.step::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-  opacity: 0;
-  transition: opacity 0.4s;
-  z-index: 0;
-}
-.step:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); }
-.step:hover::after { opacity: 0.07; }
-
-.step-number {
-  width: 38px; height: 38px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--primary), var(--accent-1));
-  color: #fff;
-  display: flex; justify-content: center; align-items: center;
-  font-weight: 800; font-size: 16px;
-  margin-bottom: 18px;
-  box-shadow: 0 4px 12px var(--primary-glow);
-  position: relative; z-index: 1;
-}
-.step h3 {
-  margin: 0 0 8px;
-  font-size: 16px; font-weight: 700;
-  color: var(--text-main);
-  position: relative; z-index: 1;
-}
-.step p {
-  margin: 0;
-  font-size: 14px; line-height: 1.6;
-  color: var(--text-sub);
-  position: relative; z-index: 1;
+  border-radius: 10px;
+  border: 1px solid rgba(220, 38, 38, 0.20);
+  font-size: 14px; font-weight: 500;
+  display: flex; align-items: center; gap: 10px;
 }
 
 /* =====================================================================
@@ -858,26 +551,1538 @@ body {
    ===================================================================== */
 footer {
   text-align: center;
-  padding: 28px;
-  border-top: 1px solid var(--border-strong);
+  padding: 24px;
+  border-top: 1px solid var(--border);
   background: var(--surface);
-  backdrop-filter: blur(16px);
   margin-top: auto;
 }
 footer p { margin: 0; font-size: 14px; color: var(--text-muted); }
+
+/* =====================================================================
+   LANGUAGE SWITCHER
+   ===================================================================== */
+.language-switcher {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+}
+.language-switcher select {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-main);
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-size: 13px;
+  font-family: var(--font);
+  cursor: pointer;
+}
+
+/* =====================================================================
+   RECORDING CHECKLIST
+   ===================================================================== */
+.recording-checklist {
+  margin-top: 24px;
+  padding: 16px 20px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.recording-checklist-title {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.recording-checklist ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+}
+.recording-checklist li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-sub);
+}
+.recording-checklist li svg {
+  color: var(--success);
+  flex-shrink: 0;
+}
+
+/* =====================================================================
+   WHY NER STRIP
+   ===================================================================== */
+.why-ner {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 36px;
+  margin-bottom: 40px;
+}
+.why-ner h2 {
+  font-family: var(--font-display);
+  margin: 0 0 12px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+.why-ner > p {
+  margin: 0 0 24px;
+  color: var(--text-sub);
+  font-size: 15px;
+  line-height: 1.6;
+  max-width: 760px;
+}
+.why-ner-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 18px;
+}
+.why-ner-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.why-ner-stat strong {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--primary);
+}
+.why-ner-stat span {
+  font-size: 13px;
+  color: var(--text-sub);
+  line-height: 1.5;
+}
+.why-ner-sources {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.why-ner-sources a {
+  color: var(--primary);
+}
+
+/* =====================================================================
+   REFERRAL CARD
+   ===================================================================== */
+.referral-message {
+  color: var(--text-sub);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 18px;
+}
 
 /* =====================================================================
    MOBILE
    ===================================================================== */
 @media (max-width: 768px) {
   .dashboard-grid   { grid-template-columns: 1fr; }
-  .steps-section    { grid-template-columns: 1fr 1fr; }
   .header-text      { display: none; }
+  .why-ner-stats    { grid-template-columns: 1fr; }
 }
 @media (max-width: 480px) {
-  .steps-section    { grid-template-columns: 1fr; }
-  .hero-section h1  { font-size: 36px; letter-spacing: -1px; }
   .upload-card, .results-card { padding: 24px 20px; }
+  .why-ner          { padding: 24px 20px; }
 }
 
+/* =====================================================================
+   SCREENING INTAKE — patient record + pain/mobility (SIH26004 a, e)
+   Field-first: large targets, high contrast, thumb-reachable.
+   ===================================================================== */
+.intake {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-2);
+  padding: 22px;
+  margin-bottom: 28px;
+}
 
+.intake-steps {
+  display: flex;
+  gap: 10px;
+  list-style: none;
+  margin: 0 0 22px;
+  padding: 0;
+  flex-wrap: wrap;
+}
+.intake-steps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 7px 14px 7px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.intake-steps li.on { color: var(--primary); border-color: var(--primary); }
+.intake-steps li.done { color: var(--success); border-color: rgba(5,150,105,0.35); }
+.intake-step-dot {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--border);
+  color: var(--text-main);
+  font-size: 11px; font-weight: 700;
+}
+.intake-steps li.on .intake-step-dot { background: var(--primary); color: #fff; }
+.intake-steps li.done .intake-step-dot { background: var(--success); color: #fff; }
+
+.intake-panel h3 {
+  font-family: var(--font-display);
+  display: flex; align-items: center; gap: 9px;
+  margin: 0 0 16px;
+  font-size: 16px; font-weight: 700;
+  color: var(--text-main);
+}
+.intake-panel h3 svg { color: var(--primary); }
+.intake-hint {
+  margin: -8px 0 18px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.intake-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field-wide { grid-column: 1 / -1; }
+.field span {
+  font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  color: var(--text-muted);
+}
+.field input, .field select {
+  padding: 13px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text-main);
+  font-size: 15px;
+  font-family: var(--font);
+}
+.field input:focus, .field select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+.intake-next, .intake-back {
+  margin-top: 20px;
+  padding: 13px 26px;
+  border-radius: 10px;
+  font-family: var(--font);
+  font-size: 15px; font-weight: 700;
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.intake-next {
+  border: none;
+  background: var(--primary);
+  color: var(--text-on-primary);
+}
+.intake-next:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+.intake-back {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-sub);
+}
+
+/* --- symptom items --- */
+.symptom { margin-bottom: 18px; }
+.symptom-q {
+  display: block;
+  font-size: 14px; font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 9px;
+}
+.symptom-scale {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.symptom-opt {
+  padding: 11px 4px;
+  border: 1px solid var(--border-strong);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text-sub);
+  font-family: var(--font);
+  font-size: 12px; font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.symptom-opt:hover { border-color: var(--primary); }
+.symptom-opt.on { color: #fff; border-color: transparent; }
+.symptom-opt.s0.on { background: var(--success); }
+.symptom-opt.s1.on { background: #65A30D; }
+.symptom-opt.s2.on { background: var(--warning); }
+.symptom-opt.s3.on { background: #EA580C; }
+.symptom-opt.s4.on { background: var(--danger); }
+
+.symptom-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 22px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+}
+.symptom-total-label {
+  display: block;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+}
+.symptom-total-value {
+  font-family: var(--font-display); font-size: 26px; font-weight: 800; }
+.symptom-total-value span { font-size: 15px; font-weight: 600; color: var(--text-muted); }
+.symptom-total-value.band-low { color: var(--success); }
+.symptom-total-value.band-borderline { color: var(--warning); }
+.symptom-total-value.band-elevated { color: var(--danger); }
+.symptom-progress { font-size: 13px; color: var(--text-muted); font-weight: 600; }
+
+@media (max-width: 560px) {
+  .intake-grid { grid-template-columns: 1fr; }
+  .symptom-scale { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* =====================================================================
+   CONNECTIVITY BADGE
+   ===================================================================== */
+.net-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(5,150,105,0.30);
+  background: rgba(5,150,105,0.07);
+  color: var(--success);
+  font-size: 11px; font-weight: 700;
+  white-space: nowrap;
+}
+.net-badge.off {
+  border-color: rgba(217,119,6,0.35);
+  background: rgba(245,158,11,0.09);
+  color: #B45309;
+}
+.saved-note {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* =====================================================================
+   PREVENTIVE GUIDANCE — SIH26004 (h)
+   ===================================================================== */
+.guidance-lead {
+  display: flex; align-items: flex-start; gap: 9px;
+  margin: 0 0 20px;
+  padding: 13px 16px;
+  border-radius: 10px;
+  background: rgba(79,70,229,0.06);
+  border: 1px solid rgba(79,70,229,0.18);
+  color: var(--text-main);
+  font-size: 14px; line-height: 1.55;
+}
+.guidance-lead svg { color: var(--primary); flex-shrink: 0; margin-top: 2px; }
+
+.guidance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+.guidance-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  padding: 18px;
+}
+.guidance-card h4 {
+  display: flex; align-items: center; gap: 8px;
+  margin: 0 0 11px;
+  font-size: 14px; font-weight: 700;
+  color: var(--text-main);
+}
+.guidance-card h4 svg { color: var(--primary); }
+.guidance-card ul { margin: 0; padding-left: 1.1em; }
+.guidance-card li {
+  font-size: 13px; line-height: 1.6;
+  color: var(--text-sub);
+  margin-bottom: 7px;
+}
+
+/* =====================================================================
+   DASHBOARD — SIH26004 analytics
+   Bands are status colours; amber is under 3:1 on this surface, so every
+   segment carries a visible count and an icon. Colour is never alone.
+   ===================================================================== */
+.dash {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 40px;
+}
+.dash-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; flex-wrap: wrap; margin-bottom: 22px;
+}
+.dash h2 {
+  font-family: var(--font-display); margin: 0; font-size: 20px; font-weight: 700; color: var(--text-main); }
+.dash-empty { margin: 0; color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+
+.dash-sync {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text-sub);
+  font-family: var(--font); font-size: 13px; font-weight: 600;
+  cursor: pointer;
+}
+.dash-sync:disabled { opacity: 0.65; cursor: default; }
+.spin { animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.dash-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.dash-tile {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  padding: 16px 18px;
+}
+.dash-tile svg { color: var(--text-muted); }
+.dash-tile strong {
+  font-family: var(--font-display);
+  display: block;
+  font-size: 30px; font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.15;
+  margin: 6px 0 2px;
+}
+.dash-tile span {
+  font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  color: var(--text-muted);
+}
+
+.dash-block { margin-bottom: 26px; }
+.dash-block h3 {
+  margin: 0 0 13px;
+  font-size: 13px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+/* 2px surface gap between segments, 4px rounded ends */
+.dash-bar {
+  display: flex;
+  gap: 2px;
+  height: 13px;
+  margin-bottom: 15px;
+}
+.dash-seg { border-radius: 3px; min-width: 5px; }
+.dash-seg:first-child { border-radius: 4px 3px 3px 4px; }
+.dash-seg:last-child { border-radius: 3px 4px 4px 3px; }
+
+.dash-legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.dash-legend li {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 13px;
+}
+.dash-legend-label { color: var(--text-sub); text-transform: capitalize; flex: 1; }
+.dash-legend strong { color: var(--text-main); font-weight: 700; }
+.dash-legend-pct { color: var(--text-muted); min-width: 42px; text-align: right; }
+
+.dash-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.dash-table th {
+  text-align: left;
+  padding: 9px 10px;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-strong);
+}
+.dash-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-sub);
+}
+.dash-table td.is-elevated { color: var(--danger); font-weight: 700; }
+
+/* =====================================================================
+   MOTION — every animation clarifies, guides or confirms.
+   200-500ms budget; anything longer has to earn it. All of it yields to
+   prefers-reduced-motion at the foot of this file.
+   ===================================================================== */
+
+.back-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  margin-bottom: 18px;
+  padding: 8px 14px 8px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-sub);
+  font-family: var(--font); font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.back-link:hover { border-color: var(--primary); transform: translateX(-2px); }
+
+/* =====================================================================
+   HOME — she opens this next to a patient. One action, her numbers.
+   ===================================================================== */
+.home { padding: 8px 0 12px; }
+.home-greet {
+  margin: 0 0 6px;
+  font-size: 15px; font-weight: 600;
+  color: var(--primary);
+  animation: riseIn 0.45s cubic-bezier(0.16,1,0.3,1) both;
+}
+.home-title {
+  font-family: var(--font-display);
+  margin: 0 0 8px;
+  font-size: clamp(34px, 5vw, 50px);
+  font-weight: 800; letter-spacing: -0.6px;
+  color: var(--text-main);
+  animation: riseIn 0.45s 0.05s cubic-bezier(0.16,1,0.3,1) both;
+}
+.home-sub {
+  margin: 0 0 30px;
+  font-size: 16px; line-height: 1.55;
+  color: var(--text-sub);
+  max-width: 34rem;
+  animation: riseIn 0.45s 0.1s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+.home-start {
+  width: 100%;
+  display: flex; align-items: center; gap: 16px;
+  padding: 22px 24px;
+  border: none;
+  border-radius: 18px;
+  background: var(--primary);
+  color: #fff;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font);
+  box-shadow: 0 10px 26px rgba(79,70,229,0.28);
+  transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.22s;
+  animation: riseIn 0.5s 0.15s cubic-bezier(0.16,1,0.3,1) both;
+}
+.home-start:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(79,70,229,0.34); }
+.home-start:active { transform: translateY(0) scale(0.99); }
+.home-start-icon {
+  width: 52px; height: 52px; flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  display: flex; align-items: center; justify-content: center;
+}
+.home-start-text { flex: 1; }
+.home-start-text strong { display: block;
+  font-family: var(--font-display); font-size: 19px; font-weight: 700; }
+.home-start-text small { display: block; margin-top: 3px; font-size: 13px; opacity: 0.85; }
+.home-start-arrow { flex-shrink: 0; transition: transform 0.22s; }
+.home-start:hover .home-start-arrow { transform: translateX(4px); }
+
+.home-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  margin: 22px 0 14px;
+  animation: riseIn 0.5s 0.2s cubic-bezier(0.16,1,0.3,1) both;
+}
+.home-stats div {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  padding: 15px 16px;
+}
+.home-stats strong { display: block;
+  font-family: var(--font-display); font-size: 26px; font-weight: 800; color: var(--text-main); }
+.home-stats span {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+  text-transform: uppercase; color: var(--text-muted);
+}
+.home-stats .is-pending strong { color: var(--warning); }
+
+.home-offline {
+  display: flex; align-items: center; gap: 8px;
+  margin: 0 0 30px;
+  font-size: 13px; color: var(--text-muted);
+  animation: riseIn 0.5s 0.25s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+.home-recent { margin-bottom: 26px; }
+.home-recent h2 {
+  margin: 0 0 12px;
+  font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--text-muted);
+}
+.home-recent ul { list-style: none; margin: 0; padding: 0; }
+.home-recent li {
+  display: flex; align-items: center; gap: 11px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+  margin-bottom: 8px;
+  font-size: 14px;
+  animation: riseIn 0.4s both;
+}
+.home-recent li:nth-child(1) { animation-delay: 0.28s; }
+.home-recent li:nth-child(2) { animation-delay: 0.33s; }
+.home-recent li:nth-child(3) { animation-delay: 0.38s; }
+.home-recent li:nth-child(4) { animation-delay: 0.43s; }
+.home-recent-name { flex: 1; font-weight: 600; color: var(--text-main); }
+.home-recent-village { color: var(--text-muted); font-size: 13px; }
+.home-recent-band { font-size: 12px; font-weight: 700; text-transform: capitalize; }
+.band-low { color: var(--success); }
+.band-borderline { color: #B45309; }
+.band-elevated { color: var(--danger); }
+
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =====================================================================
+   WALK PROGRESS — the 40s wait, made legible without words
+   ===================================================================== */
+.walkprog { margin-top: 24px; }
+.walkprog-canvas {
+  width: 100%; height: 74px; display: block;
+  margin-bottom: 14px;
+}
+.walkprog-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+.walkprog-steps li {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px; color: var(--text-muted);
+  transition: color 0.3s;
+}
+.walkprog-dot {
+  width: 18px; height: 18px; flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  transition: background 0.3s, border-color 0.3s;
+}
+.walkprog-steps li.on { color: var(--text-main); font-weight: 600; }
+.walkprog-steps li.on .walkprog-dot {
+  border-color: var(--primary);
+  animation: dotPulse 1.1s ease-in-out infinite;
+}
+.walkprog-steps li.done { color: var(--text-sub); }
+.walkprog-steps li.done .walkprog-dot { background: var(--success); border-color: var(--success); }
+@keyframes dotPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(79,70,229,0.35); }
+  50%     { box-shadow: 0 0 0 5px rgba(79,70,229,0); }
+}
+
+/* =====================================================================
+   SYNC — a day in the field, landing one record at a time
+   ===================================================================== */
+.sync {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  padding: 20px;
+  margin-bottom: 32px;
+}
+.sync-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.sync-title {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-size: 14px; font-weight: 700; color: var(--text-main);
+}
+.sync-title svg { color: var(--primary); }
+.sync-go {
+  padding: 9px 20px;
+  border: none; border-radius: 9px;
+  background: var(--primary); color: #fff;
+  font-family: var(--font); font-size: 13px; font-weight: 700;
+  cursor: pointer;
+}
+.sync-go:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+
+.sync-list { list-style: none; margin: 0; padding: 0; }
+.sync-list li {
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-size: 14px;
+  color: var(--text-sub);
+  transition: background 0.3s, opacity 0.3s, transform 0.3s;
+}
+.sync-check {
+  width: 20px; height: 20px; flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  transition: background 0.25s, border-color 0.25s, transform 0.25s;
+}
+.sync-list li.sent { background: rgba(5,150,105,0.07); }
+.sync-list li.sent .sync-check {
+  background: var(--success); border-color: var(--success);
+  transform: scale(1.12);
+}
+.sync-name { flex: 1; font-weight: 600; color: var(--text-main); }
+.sync-village { font-size: 13px; color: var(--text-muted); }
+
+.sync-milestone {
+  text-align: center;
+  padding: 14px 8px;
+  animation: riseIn 0.5s cubic-bezier(0.16,1,0.3,1) both;
+}
+.sync-milestone svg { color: var(--primary); animation: badgePop 0.55s cubic-bezier(0.34,1.56,0.64,1) both; }
+.sync-milestone strong {
+  font-family: var(--font-display);
+  display: block; margin: 10px 0 6px;
+  font-size: 22px; font-weight: 800; color: var(--text-main);
+}
+.sync-milestone span {
+  display: block; max-width: 26rem; margin: 0 auto 18px;
+  font-size: 14px; line-height: 1.6; color: var(--text-sub);
+}
+.sync-milestone button {
+  padding: 11px 26px;
+  border: none; border-radius: 9px;
+  background: var(--primary); color: #fff;
+  font-family: var(--font); font-size: 14px; font-weight: 700;
+  cursor: pointer;
+}
+@keyframes badgePop {
+  0%   { transform: scale(0.4) rotate(-14deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+/* =====================================================================
+   RESULTS REVEAL — sections arrive in sequence so she can follow
+   ===================================================================== */
+.results-card.reveal > * { animation: riseIn 0.45s cubic-bezier(0.16,1,0.3,1) both; }
+.results-card.reveal > *:nth-child(1) { animation-delay: 0.00s; }
+.results-card.reveal > *:nth-child(2) { animation-delay: 0.06s; }
+.results-card.reveal > *:nth-child(3) { animation-delay: 0.12s; }
+.results-card.reveal > *:nth-child(4) { animation-delay: 0.18s; }
+.results-card.reveal > *:nth-child(5) { animation-delay: 0.24s; }
+.results-card.reveal > *:nth-child(6) { animation-delay: 0.30s; }
+.results-card.reveal > *:nth-child(n+7) { animation-delay: 0.36s; }
+
+/* the worse knee pulses ONCE — it points, it does not nag */
+.worse-knee-card { animation: kneeAttention 1.4s 0.5s ease-out both; }
+@keyframes kneeAttention {
+  0%   { box-shadow: 0 0 0 0 rgba(30,58,138,0); }
+  35%  { box-shadow: 0 0 0 7px rgba(30,58,138,0.16); }
+  100% { box-shadow: 0 0 0 0 rgba(30,58,138,0); }
+}
+
+/* field confirmation: the pattern low-literacy research asks for */
+.field input:not(:placeholder-shown):valid {
+  border-color: rgba(5,150,105,0.45);
+}
+
+/* =====================================================================
+   REDUCED MOTION — some users set this for medical reasons
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .home-greet, .home-title, .home-sub, .home-start, .home-stats,
+  .home-offline, .home-recent li, .sync-milestone, .sync-milestone svg,
+  .results-card.reveal > *, .worse-knee-card {
+    animation: none !important;
+  }
+  .home-start:hover { transform: none; }
+  .walkprog-steps li.on .walkprog-dot { animation: none; }
+}
+
+@media (max-width: 560px) {
+  .home-stats { grid-template-columns: 1fr 1fr; }
+  .home-stats div:last-child { grid-column: 1 / -1; }
+  .home-start { padding: 18px; gap: 13px; }
+  .home-start-icon { width: 44px; height: 44px; }
+}
+
+/* =====================================================================
+   SCRIPT-AWARE TYPE
+   Assamese and Meitei render in Hind Siliguri, drawn for UI clarity in
+   these scripts, with Baloo Da 2 carrying the headings.
+   ===================================================================== */
+html[data-lang="as"] body,
+html[data-lang="mni"] body,
+html[data-lang="as"] .home-title,
+html[data-lang="mni"] .home-title,
+html[data-lang="as"] .home-title,
+html[data-lang="mni"] .home-title {
+  letter-spacing: -0.4px;
+  line-height: 1.22;
+}
+/* Bengali-script glyphs sit taller; give the label rows more room */
+html[data-lang="as"] .symptom-opt,
+html[data-lang="mni"] .symptom-opt { padding: 12px 4px; line-height: 1.5; }
+html[data-lang="as"] .walkprog-steps li,
+html[data-lang="mni"] .walkprog-steps li { line-height: 1.6; }
+
+/* =====================================================================
+   BACKGROUND — gamosa weave.
+   Warm cloth ground, indigo/violet woven borders, soft depth behind.
+   Nothing exceeds 22% opacity; every text surface carries its own ground.
+   ===================================================================== */
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  /* warm off-white: handwoven cotton, not clinical blue-white */
+  background: linear-gradient(180deg, #FDFCFA 0%, #F8F7FC 45%, #FAF8FD 100%);
+}
+
+/* ---- depth behind the cloth ---- */
+.aurora { position: absolute; inset: -25%; filter: blur(64px); }
+.aurora-blob {
+  position: absolute; display: block;
+  border-radius: 46% 54% 58% 42% / 52% 46% 54% 48%;
+  mix-blend-mode: multiply;
+  will-change: transform;
+}
+.aurora-blob.b1 {
+  width: 48vw; height: 44vw; top: 4%; left: -8%;
+  background: radial-gradient(circle at 36% 38%, rgba(99,102,241,0.34), rgba(99,102,241,0) 68%);
+  animation: drift1 58s ease-in-out infinite;
+}
+.aurora-blob.b2 {
+  width: 44vw; height: 42vw; top: 22%; right: -8%;
+  background: radial-gradient(circle at 60% 42%, rgba(139,92,246,0.30), rgba(139,92,246,0) 68%);
+  animation: drift2 70s ease-in-out infinite;
+}
+.aurora-blob.b3 {
+  width: 52vw; height: 46vw; bottom: -16%; left: 18%;
+  background: radial-gradient(circle at 46% 56%, rgba(59,130,246,0.24), rgba(59,130,246,0) 70%);
+  animation: drift3 64s ease-in-out infinite;
+}
+@keyframes drift1 {
+  0%,100% { transform: translate3d(0,0,0) scale(1); }
+  50%     { transform: translate3d(5vw, 4vh, 0) scale(1.1); }
+}
+@keyframes drift2 {
+  0%,100% { transform: translate3d(0,0,0) scale(1.05); }
+  50%     { transform: translate3d(-4vw, 5vh, 0) scale(0.95); }
+}
+@keyframes drift3 {
+  0%,100% { transform: translate3d(0,0,0) scale(1); }
+  50%     { transform: translate3d(4vw, -4vh, 0) scale(1.08); }
+}
+
+/* ---- the cloth ---- */
+.gamosa-cloth {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  opacity: 0.06;                /* just enough to feel like fabric */
+}
+
+@keyframes weaveIn {
+  to { clip-path: inset(0 0 0 0); }
+}
+
+/* content floats above */
+.app { position: relative; z-index: 1; }
+.main-content { position: relative; z-index: 1; }
+footer { position: relative; z-index: 1; }
+
+/* surfaces sit on their own ground so the cloth never muddies text */
+.header { background: rgba(255,255,255,0.86); backdrop-filter: blur(14px); }
+footer  { background: rgba(255,255,255,0.86); backdrop-filter: blur(14px); }
+.glass-card, .dash, .sync, .why-ner, .home-stats div, .home-recent li {
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(12px);
+}
+
+@media (max-width: 560px) {
+  .aurora { filter: blur(50px); }
+  .gamosa-band { opacity: 0.3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob { animation: none !important; }
+
+}
+
+/* =====================================================================
+   TYPOGRAPHIC DETAIL
+   More scale contrast, a woven rule under the eyebrow, and optical
+   tuning for Baloo's rounded forms at large sizes.
+   ===================================================================== */
+
+/* the greeting gets a small woven rule, echoing the pari stripe */
+.home-greet {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+}
+.home-greet::before {
+  content: "";
+  width: 26px; height: 6px;
+  background:
+    linear-gradient(var(--primary), var(--primary)) 0 0 / 100% 1.5px no-repeat,
+    linear-gradient(var(--violet), var(--violet)) 0 4.5px / 100% 1.5px no-repeat;
+  flex-shrink: 0;
+}
+
+/* the wordmark's accent colour; size and weight are set in the
+   typographic-detail block at the foot of this file */
+.home-title .mark-accent { color: var(--primary); }
+
+/* section headings pick up a small diamond, so the motif recurs in type */
+.dash h2::before,
+.why-ner h2::before,
+.home-recent h2::before {
+  content: "";
+  display: inline-block;
+  width: 9px; height: 9px;
+  margin-right: 10px;
+  background: var(--primary);
+  transform: rotate(45deg);
+  vertical-align: 1px;
+  opacity: 0.65;
+}
+
+/* the logo mark, given room to show its detail */
+.logo-icon {
+  background: linear-gradient(145deg, var(--primary), var(--violet));
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.32);
+}
+.logo-text h2 {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+.logo-text p {
+  font-size: 9.5px;
+  letter-spacing: 1.4px;
+  color: var(--violet);
+}
+
+/* =====================================================================
+   GAMOSA — bands and watermark
+   ===================================================================== */
+.gamosa-band {
+  overflow: hidden;
+  opacity: 0.46;
+  pointer-events: none;
+  margin: 0 0 30px;
+}
+.gamosa-band.flip { transform: scaleY(-1); margin: 48px 0 0; }
+.gamosa-band svg { display: block; }
+
+.gamosa-watermark {
+  position: absolute;
+  top: 14%; right: -6%;
+  width: 46vw; height: 46vw;
+  opacity: 0.05;
+  animation: watermarkTurn 120s linear infinite;
+}
+@keyframes watermarkTurn {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@media (max-width: 560px) {
+  .gamosa-band { opacity: 0.34; }
+  .gamosa-watermark { width: 90vw; height: 90vw; opacity: 0.04; }
+  .home-greet { font-size: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gamosa-watermark { animation: none; }
+}
+
+/* =====================================================================
+   TYPOGRAPHIC DETAIL
+   Techniques that do actual work, not decoration.
+
+   Skipped deliberately: font-optical-sizing. Neither Baloo Da 2 nor Hind
+   Siliguri ships an `opsz` axis, so it would be a no-op — the tracking
+   below does that job by hand instead.
+   ===================================================================== */
+
+:root {
+  /* Modular scale, anchored in rem so it respects the user's font size,
+     with vw only as the fluid term. Pure-vw scales ignore that setting. */
+  --step--1: clamp(0.78rem, 0.75rem + 0.14vw, 0.86rem);
+  --step-0:  clamp(0.95rem, 0.91rem + 0.20vw, 1.06rem);
+  --step-1:  clamp(1.12rem, 1.04rem + 0.38vw, 1.35rem);
+  --step-2:  clamp(1.32rem, 1.18rem + 0.68vw, 1.72rem);
+  --step-3:  clamp(1.56rem, 1.31rem + 1.20vw, 2.20rem);
+  --step-4:  clamp(1.84rem, 1.40rem + 2.10vw, 2.80rem);
+  --step-6:  clamp(2.40rem, 1.30rem + 5.20vw, 4.10rem);
+}
+
+body {
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures contextual;
+  text-rendering: optimizeLegibility;
+  /* Safari only; hangs the opening quote into the margin */
+  hanging-punctuation: first;
+}
+
+/* ---------------------------------------------------------------------
+   1. Digits that do not jitter.
+   The risk score animates 0 -> 68.4 and the counters tick upward. With
+   proportional figures every digit change shifts the text sideways;
+   tabular figures give every digit the same advance width so the number
+   stays put while it counts.
+   --------------------------------------------------------------------- */
+.risk-circle,
+.home-stats strong,
+.dash-tile strong,
+.symptom-total-value,
+.why-ner-stat strong,
+.dash-legend strong,
+.dash-legend-pct,
+.dash-table td,
+.sync-title,
+.measurement-value {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+
+/* ---------------------------------------------------------------------
+   2. Line breaking.
+   balance evens a heading's lines; pretty reflows the last lines of a
+   paragraph so it never ends on an orphan.
+   --------------------------------------------------------------------- */
+h1, h2, h3, h4,
+
+/* ---------------------------------------------------------------------
+   3. Optical tracking.
+   Type needs less letter-space as it grows and more as it shrinks. Doing
+   this by hand is what an opsz axis would otherwise do for us.
+   --------------------------------------------------------------------- */
+.home-title       { letter-spacing: -0.028em; }
+.dash h2,
+.why-ner h2,
+.report-header h2 { letter-spacing: -0.014em; }
+.home-sub         { letter-spacing: -0.006em; }
+.home-greet,
+.dash-block h3,
+.home-recent h2   { letter-spacing: 0.12em; }
+.field span,
+.home-stats span,
+.dash-tile span   { letter-spacing: 0.07em; }
+
+/* ---------------------------------------------------------------------
+   4. The variable weight axis.
+   Baloo Da 2 is a true variable font (wght 400-800), so weight can be
+   set continuously rather than snapped to four static steps.
+   --------------------------------------------------------------------- */
+.home-title {
+  font-size: var(--step-6);
+  font-variation-settings: "wght" 780;
+  line-height: 1.02;
+}
+.home-title .mark-accent { font-variation-settings: "wght" 800; }
+.dash h2, .why-ner h2 {
+  font-size: var(--step-1);
+  font-variation-settings: "wght" 700;
+}
+.report-header h2 {
+  font-size: var(--step-2);
+  font-variation-settings: "wght" 700;
+}
+.home-start-text strong { font-variation-settings: "wght" 720; }
+.sync-milestone strong  { font-variation-settings: "wght" 760; }
+.logo-text h2           { font-variation-settings: "wght" 750; }
+
+/* ---------------------------------------------------------------------
+   5. A drop cap on the one long-form paragraph.
+   Progressive enhancement: unsupported browsers get a normal first
+   letter, and it is switched off for Bengali script, where a sunk
+   initial breaks the matra line above the characters.
+   --------------------------------------------------------------------- */
+.why-ner > p:first-of-type::first-letter {
+  -webkit-initial-letter: 3;
+  initial-letter: 3;
+  font-family: var(--font-display);
+  font-variation-settings: "wght" 800;
+  color: var(--primary);
+  margin-right: 0.09em;
+}
+html[data-lang="as"] .why-ner > p:first-of-type::first-letter,
+html[data-lang="mni"] .why-ner > p:first-of-type::first-letter {
+  -webkit-initial-letter: normal;
+  initial-letter: normal;
+  font-size: inherit;
+  color: inherit;
+  margin-right: 0;
+}
+
+/* ---------------------------------------------------------------------
+   6. Measure and rhythm.
+   --------------------------------------------------------------------- */
+.home-sub, .why-ner > p, .guidance-lead, .dash-empty { max-width: 62ch; }
+.guidance-card li, .measurement-reading { max-width: 46ch; }
+.home-sub { font-size: var(--step-1); line-height: 1.55; }
+.why-ner > p { font-size: var(--step-0); line-height: 1.7; }
+
+/* =====================================================================
+   TYPE SYSTEM — three faces, three jobs.
+
+   Tiro Bangla   display. A Bengali/Latin serif rooted in traditional
+                 Bengali print letterforms. Dignified rather than
+                 friendly-generic. Ships ONE weight (400), so bold is
+                 forbidden here — font-synthesis is off, and presence
+                 comes from size, tracking and colour instead.
+   Hind Siliguri body and UI. Drawn for continuous reading in Assamese.
+   Baloo Da 2    the warm, rounded voice — buttons and action labels,
+                 where friendliness beats gravitas. Variable 400-800.
+   ===================================================================== */
+:root {
+  --font-display: 'Tiro Bangla', Georgia, serif;
+  --font: 'Hind Siliguri', system-ui, -apple-system, sans-serif;
+  --font-ui: 'Baloo Da 2', 'Hind Siliguri', system-ui, sans-serif;
+  --font-indic: 'Hind Siliguri', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+/* the display face has no bold; never let the browser fake one */
+.dash h2, .why-ner h2, .report-header h2,
+.sync-milestone strong, .intake-panel h3, .measurements h3,
+.home-recent h2, .upload-area h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-synthesis: none;
+  font-variation-settings: normal;
+}
+
+/* the wordmark: a serif at scale, carried by size and tracking */
+.home-title {
+  font-size: clamp(2.9rem, 1.4rem + 6.4vw, 5.2rem);
+  line-height: 1.04;
+  letter-spacing: -0.012em;
+}
+.home-title .mark-accent { color: var(--primary); font-style: italic; }
+
+.logo-text h2 { font-size: 21px; letter-spacing: -0.005em; }
+.dash h2, .why-ner h2 { font-size: var(--step-2); letter-spacing: -0.008em; }
+.report-header h2 { font-size: var(--step-3); }
+.measurements h3, .intake-panel h3 { font-size: var(--step-1); }
+.upload-area h3 { font-size: var(--step-1); }
+.home-recent h2 {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase;
+}
+
+/* the rounded voice, kept for the things she taps */
+.home-start-text strong, .analyze-button, .intake-next, .sync-go,
+.home-start-text strong {
+  font-size: 20px;
+  font-variation-settings: "wght" 700;
+}
+
+/* a serif needs a touch more leading than a sans at the same size */
+.why-ner > p { line-height: 1.75; }
+
+/* the drop cap follows the display serif */
+.why-ner > p:first-of-type::first-letter {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-synthesis: none;
+  font-variation-settings: normal;
+}
+
+/* =====================================================================
+   THE CLOTH — a gamosa in 3D space.
+
+   perspective + preserve-3d put the whole background on a plane that
+   recedes; the medallion rings sit at different translateZ so they
+   parallax against one another as the plane tilts. GPU-composited, no
+   WebGL, no per-frame JS.
+   ===================================================================== */
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background: linear-gradient(180deg, #FDFCFA 0%, #F7F6FC 45%, #FAF8FD 100%);
+  perspective: 1500px;
+  perspective-origin: 50% 42%;
+}
+
+.cloth-scene {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+/* the cloth itself, tilted just enough to read as a surface */
+.cloth-plane {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(7deg) rotateY(-3.5deg) translateZ(-60px) scale(1.14);
+  animation: clothBreathe 42s ease-in-out infinite;
+}
+@keyframes clothBreathe {
+  0%, 100% { transform: rotateX(7deg)   rotateY(-3.5deg) translateZ(-60px) scale(1.14); }
+  50%      { transform: rotateX(4.5deg) rotateY(2.5deg)  translateZ(-40px) scale(1.11); }
+}
+
+.cloth-weave {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  opacity: 0.07;
+}
+
+/* drape — soft light and shadow across the folds */
+.cloth-folds {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(96deg,
+      rgba(79,70,229,0.055) 0%,
+      rgba(255,255,255,0) 18%,
+      rgba(79,70,229,0.045) 38%,
+      rgba(255,255,255,0) 58%,
+      rgba(124,58,237,0.05) 78%,
+      rgba(255,255,255,0) 100%),
+    linear-gradient(180deg,
+      rgba(255,255,255,0.5) 0%,
+      rgba(255,255,255,0) 30%,
+      rgba(30,58,138,0.035) 100%);
+}
+
+/* --- the four woven edges --- */
+.cloth-edge { position: absolute; overflow: hidden; opacity: 0.4; }
+.cloth-edge svg { display: block; }
+
+.edge-top    { top: 64px; left: 0; right: 0; height: 116px; transform: translateZ(14px); }
+.edge-bottom { bottom: 0; left: 0; right: 0; height: 116px; transform: translateZ(14px) scaleY(-1); }
+
+
+/* --- central medallion, layered in depth --- */
+.medallion {
+  position: absolute;
+  top: 46%; left: 50%;
+  width: min(52vw, 620px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  transform-style: preserve-3d;
+}
+.med-ring {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+}
+/* each ring on its own Z plane — this is what makes the tilt read as 3D */
+.med-1 { opacity: 0.11; transform: translateZ(0); }
+.med-2 { opacity: 0.13; transform: translateZ(46px); animation: medSpin 150s linear infinite; }
+.med-3 { opacity: 0.15; transform: translateZ(92px); animation: medSpin 110s linear infinite reverse; }
+
+@keyframes medSpin {
+  from { transform: translateZ(var(--z, 46px)) rotate(0deg); }
+  to   { transform: translateZ(var(--z, 46px)) rotate(360deg); }
+}
+.med-2 { --z: 46px; }
+.med-3 { --z: 92px; }
+
+@media (max-width: 720px) {
+  .cloth-plane { transform: rotateX(5deg) rotateY(-2deg) translateZ(-40px) scale(1.1); animation: none; }   /* no room for side borders */
+  .cloth-edge { opacity: 0.3; }
+  .medallion { width: 96vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cloth-plane { animation: none; }
+  .med-2, .med-3 { animation: none; }
+}
+
+/* =====================================================================
+   THE MARK — nested diamonds on separate Z planes
+   ===================================================================== */
+.logo-icon {
+  perspective: 260px;
+  display: flex; align-items: center; justify-content: center;
+}
+.kingkhap {
+  position: relative;
+  display: block;
+  transform-style: preserve-3d;
+  transform: rotateX(12deg) rotateY(-14deg);
+  transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.logo:hover .kingkhap { transform: rotateX(-8deg) rotateY(16deg); }
+.kk-layer { position: absolute; inset: 0; width: 100%; height: 100%; }
+.kk-1 { transform: translateZ(0);   opacity: 0.62; }
+.kk-2 { transform: translateZ(7px); opacity: 0.85; }
+.kk-3 { transform: translateZ(14px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .kingkhap { transform: none; transition: none; }
+  .logo:hover .kingkhap { transform: none; }
+}
+
+/* =====================================================================
+   DEPTH — the scene responds to the viewer.
+
+   --px / --py are published by useParallax (-1..1). Every layer reads
+   them with a different multiplier; that differential is what the eye
+   reads as depth. A static tilt does not do this, which is why the
+   previous pass still looked flat.
+   ===================================================================== */
+:root { --px: 0; --py: 0; }
+
+/* ---------- the cloth, further back, moves least ---------- */
+.cloth-plane {
+  transform:
+    rotateX(calc(3.5deg + var(--py) * -2.6deg))
+    rotateY(calc(var(--px) * 3.2deg))
+    translateZ(-40px) scale(1.10);
+  animation: none;                      /* the pointer drives it now */
+  transition: transform 0.12s linear;
+}
+
+/* the four edges lift off the weave — each keeps its own placement, so
+   the Z is applied per edge rather than as a blanket rule that would
+   wipe the 90deg rotation the side bands depend on */
+.edge-top    { transform: translateZ(24px); }
+.edge-bottom { transform: translateZ(24px) scaleY(-1); }
+
+/* medallion rings — the differential here is the strongest depth cue */
+.med-1 { transform: translateZ(10px)  translate(calc(var(--px) * -10px), calc(var(--py) * -7px)); }
+.med-2 { transform: translateZ(70px)  translate(calc(var(--px) * -26px), calc(var(--py) * -18px)); }
+.med-3 { transform: translateZ(130px) translate(calc(var(--px) * -46px), calc(var(--py) * -32px)); }
+.med-2, .med-3 { animation: none; }
+
+/* ---------- the content itself sits in 3D, not flat on top ---------- */
+.main-content {
+  perspective: 1600px;
+  perspective-origin: calc(50% + var(--px) * 6%) calc(45% + var(--py) * 6%);
+  transform-style: preserve-3d;
+}
+
+/* each surface on its own plane, near things reacting more than far */
+.home-start {
+  transform: translateZ(70px)
+             rotateX(calc(var(--py) * -3.4deg))
+             rotateY(calc(var(--px) * 4.6deg));
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s;
+  /* the shadow falls away from the light, so it tracks the tilt */
+  box-shadow:
+    calc(var(--px) * -22px) calc(18px + var(--py) * -10px) 42px rgba(79, 70, 229, 0.34),
+    0 2px 0 rgba(255, 255, 255, 0.22) inset;
+}
+.home-start:hover {
+  transform: translateZ(104px)
+             rotateX(calc(var(--py) * -4.6deg))
+             rotateY(calc(var(--px) * 6.2deg));
+}
+
+.home-stats div {
+  transform: translateZ(34px)
+             rotateX(calc(var(--py) * -1.9deg))
+             rotateY(calc(var(--px) * 2.6deg));
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s;
+  box-shadow: calc(var(--px) * -9px) calc(9px + var(--py) * -5px) 20px rgba(15, 23, 42, 0.09);
+}
+.home-stats div:hover { transform: translateZ(58px); }
+
+.dash, .why-ner, .glass-card, .sync {
+  transform: translateZ(16px)
+             rotateX(calc(var(--py) * -1.1deg))
+             rotateY(calc(var(--px) * 1.5deg));
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: calc(var(--px) * -12px) calc(14px + var(--py) * -6px) 34px rgba(15, 23, 42, 0.10);
+}
+
+.home-recent li {
+  transform: translateZ(22px) rotateY(calc(var(--px) * 1.8deg));
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.home-recent li:hover { transform: translateZ(44px) rotateY(calc(var(--px) * 1.8deg)); }
+
+/* text nearest the viewer, so it separates from the cloth behind it */
+.home-greet  { transform: translateZ(46px); }
+.home-title  { transform: translateZ(60px); }
+.home-sub    { transform: translateZ(40px); }
+.home-offline{ transform: translateZ(26px); }
+.home-title, .home-greet, .home-sub, .home-offline { transform-style: preserve-3d; }
+
+/* the header floats above the whole scene */
+.header {
+  box-shadow:
+    calc(var(--px) * -6px) 10px 30px rgba(15, 23, 42, 0.07),
+    0 1px 0 rgba(15, 23, 42, 0.05);
+}
+
+/* ---------- the mark tracks the pointer too ---------- */
+.kingkhap {
+  transform:
+    rotateX(calc(10deg + var(--py) * -14deg))
+    rotateY(calc(-12deg + var(--px) * 20deg));
+  transition: transform 0.2s linear;
+}
+.logo:hover .kingkhap {
+  transform:
+    rotateX(calc(-10deg + var(--py) * -16deg))
+    rotateY(calc(16deg + var(--px) * 22deg));
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.kk-1 { transform: translateZ(0);    opacity: 0.55; }
+.kk-2 { transform: translateZ(9px);  opacity: 0.8; }
+.kk-3 { transform: translateZ(18px); }
+
+/* ---------- coarse pointers and reduced motion get the flat scene ---------- */
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .home-start, .home-stats div, .dash, .why-ner, .glass-card, .sync,
+  .home-recent li, .home-greet, .home-title, .home-sub,
+  .home-offline {
+    transform: none;
+  }
+  .cloth-plane {
+    transform: rotateX(3deg) translateZ(-30px) scale(1.08);
+    transition: none;
+  }
+  .med-1, .med-2, .med-3 { transform: none; }
+  .kingkhap, .logo:hover .kingkhap { transform: none; }
+  .home-start { box-shadow: 0 12px 30px rgba(79, 70, 229, 0.3); }
+}
+
+/* =====================================================================
+   SCROLL-DRIVEN 3D
+   animation-timeline: view() / scroll() — native, no JS, and running on
+   the compositor thread, which is what keeps this at 60fps on the cheap
+   Android this app targets.
+
+   Everything here animates the INDEPENDENT `translate` / `rotate` / `scale`
+   properties rather than `transform`. The pointer-parallax layer already
+   owns `transform`; these compose with it instead of overwriting it, so
+   the two systems run together without animation-composition tricks.
+   ===================================================================== */
+@supports (animation-timeline: view()) {
+
+  /* ---- cards rise out of depth as they enter the viewport ---- */
+  .home-stats div,
+  .dash,
+  .why-ner,
+  .glass-card,
+  .sync,
+  .home-recent li,
+  .guidance-card {
+    animation: liftIn linear both;
+    animation-timeline: view();
+    animation-range: entry 4% cover 28%;
+  }
+  @keyframes liftIn {
+    from {
+      opacity: 0;
+      translate: 0 46px -150px;
+      rotate: x 15deg;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0 0;
+      rotate: x 0deg;
+    }
+  }
+
+  /* the primary action arrives from further back and lands harder */
+  .home-start {
+    animation: startIn linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 24%;
+  }
+  @keyframes startIn {
+    from { opacity: 0; translate: 0 60px -280px; rotate: x 20deg; }
+    to   { opacity: 1; translate: 0 0 0;         rotate: x 0deg; }
+  }
+
+  /* ---- the cloth recedes as the page scrolls ---- */
+  .cloth-plane {
+    animation: clothRecede linear both;
+    animation-timeline: scroll(root block);
+  }
+  @keyframes clothRecede {
+    from { translate: 0 0 0; }
+    to   { translate: 0 -70px -300px; }
+  }
+
+  /* depth of field: the far cloth softens as it pulls away */
+  .cloth-weave {
+    animation: clothBlur linear both;
+    animation-timeline: scroll(root block);
+  }
+  @keyframes clothBlur {
+    from { filter: blur(0px);   opacity: 0.07; }
+    to   { filter: blur(2.4px); opacity: 0.03; }
+  }
+
+  /* ---- the medallion turns and drifts back with the scroll ---- */
+  .medallion {
+    animation: medScroll linear both;
+    animation-timeline: scroll(root block);
+  }
+  @keyframes medScroll {
+    from { rotate: 0deg;  translate: -50% -50% 0; }
+    to   { rotate: 34deg; translate: -50% -50% -180px; }
+  }
+
+  /* ---- the wordmark settles forward as you arrive ---- */
+  .home-title {
+    animation: titleSettle linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 30%;
+  }
+  @keyframes titleSettle {
+    from { opacity: 0; translate: 0 26px -120px; rotate: x 11deg; }
+    to   { opacity: 1; translate: 0 0 0;         rotate: x 0deg; }
+  }
+}
+
+/* the whole scroll-3D layer is opt-out for motion sensitivity */
+@media (prefers-reduced-motion: reduce) {
+  .home-stats div, .dash, .why-ner, .glass-card, .sync, .home-recent li,
+  .guidance-card, .home-start, .cloth-plane, .cloth-weave, .medallion, .home-title {
+    animation: none !important;
+    opacity: 1 !important;
+    translate: none !important;
+    rotate: none !important;
+    filter: none !important;
+  }
+  /* the medallion still needs its centring translate */
+  .medallion { translate: -50% -50% !important; }
+}
