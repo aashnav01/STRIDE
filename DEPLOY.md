@@ -28,8 +28,14 @@ Render Dashboard → **New → Blueprint** → connect `aashnav01/STRIDE`, branc
 `main`. It will prompt for the two `sync: false` variables. Leave them blank
 for now and apply.
 
-The first backend build takes 5–10 minutes — mediapipe, opencv and interpret
-are large.
+The backend builds as a **Docker image**, not on Render's native Python
+runtime. MediaPipe links against OpenGL ES (`libGLESv2`, `libEGL`) even for
+headless CPU work, and depends on the non-headless `opencv-contrib-python`
+regardless of what is pinned; the native runtime has neither library and no
+way to install them. The Dockerfile installs them explicitly.
+
+The first build takes 5–10 minutes — mediapipe, opencv and interpret are
+large.
 
 **2 — Wait for the backend, then copy its URL**
 
@@ -80,6 +86,7 @@ Open the frontend and start a screening. If a request fails, check in order:
 | `ERR_NAME_NOT_RESOLVED`, host looks right | Points at a service that no longer exists, or the bundle was not rebuilt |
 | CORS error in console | `ALLOWED_ORIGINS` does not exactly match the frontend origin |
 | 500, `model_loaded: false` | Model failed to load; see the build log |
+| 500, `libGLESv2.so.2: cannot open shared object file` | Backend is on the native Python runtime. MediaPipe needs system GL libraries — the service must use the Docker runtime (`runtime: docker` in `render.yaml`) |
 | First request hangs ~50 s | Free instance waking from sleep — this is normal |
 
 ## Before a demo

@@ -22,11 +22,12 @@
 services:
   - type: web
     name: stride-backend
-    runtime: python
+    # docker, not the native python runtime: MediaPipe needs libGLESv2 and
+    # libEGL, which the native runtime lacks and cannot install
+    runtime: docker
     rootDir: backend
+    dockerfilePath: ./Dockerfile
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     # disk:                       # requires plan: starter or above
     #   name: stride-data
@@ -35,9 +36,7 @@ services:
     envVars:
       # with a disk attached, point this at /var/data/screenings.db
       - key: SCREENINGS_DB
-        value: /tmp/screenings.db
-      - key: PYTHON_VERSION
-        value: 3.12.7
+        value: /var/data/screenings.db
       # the frontend's public URL, e.g. https://stride-frontend-ab12.onrender.com
       - key: ALLOWED_ORIGINS
         sync: false

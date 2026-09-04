@@ -1,0 +1,16 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# never bake patient data or uploaded footage into an image
+screenings.db
+*.db
+*.sqlite*
+uploads/
+*.csv
+
+.env
+.env.*
+*.log
+.git
