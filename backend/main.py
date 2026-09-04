@@ -162,12 +162,24 @@ def release_screener():
     print("KOA model released")
 
 
-# Load once at boot purely to prove the artefacts are readable, then let it
-# go. /health reports the outcome without pinning 242 MB for the lifetime
-# of the process.
-load_screener()
-if screener is not None and not KEEP_MODEL_LOADED:
-    release_screener()
+# Deliberately NOT loaded at boot. Loading it even once allocates ~242 MB
+# that Python never returns to the OS, so it would sit in RSS during pose
+# extraction and push the process past a 512 MB limit — which is exactly
+# what was happening (peak 478 MB, then OOM-killed mid-request).
+#
+# Instead: verify the artefacts exist, and load for real only after
+# extraction has finished and MediaPipe has torn its buffers down.
+_REQUIRED = ("koa_model.joblib", "koa_severity.joblib")
+_missing = [f for f in _REQUIRED if not os.path.exists(os.path.join(MODEL_DIR, f))]
+if _missing:
+    _model_ok = False
+    print("KOA model artefacts missing:", _missing)
+else:
+    _model_ok = True
+    print(f"KOA model artefacts present in {MODEL_DIR}; loading deferred")
+
+if KEEP_MODEL_LOADED:
+    load_screener()
 
 
 # ============================================================
