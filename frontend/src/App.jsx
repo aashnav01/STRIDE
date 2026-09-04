@@ -20,9 +20,16 @@ import ReferralCard from './components/ReferralCard'
 import WhyNER from './components/WhyNER'
 import './App.css'
 
-// Render's fromService supplies a bare hostname with no scheme; without
-// this the value would be treated as a relative path by fetch().
+// VITE_API_URL is read by Vite at BUILD time and compiled into the
+// bundle. If it is unset in a production build the app will call
+// localhost and fail, so say so loudly rather than failing at DNS.
 const RAW_API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+if (import.meta.env.PROD && !import.meta.env.VITE_API_URL) {
+  console.error(
+    '[config] VITE_API_URL was not set at build time. Set it on the ' +
+    'frontend service and redeploy — a restart will not rebuild the bundle.'
+  )
+}
 const API_URL = /^https?:\/\//.test(RAW_API) ? RAW_API : `https://${RAW_API}`
 
 const PROGRESS_STEP_COUNT = 4     // labels live in WalkProgress, translated
