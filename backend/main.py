@@ -127,6 +127,12 @@ print("=" * 60)
 # and keep the model resident.
 KEEP_MODEL_LOADED = os.environ.get("KEEP_MODEL_LOADED") == "1"
 
+# Quality gate. The model needs three 48-frame windows of usable signal;
+# these bound "usable" without rejecting footage the model was trained on.
+MIN_DETECTION_RATE = float(os.environ.get("MIN_DETECTION_RATE", "0.5"))
+MIN_DETECTED_FRAMES = int(os.environ.get("MIN_DETECTED_FRAMES", "150"))
+MIN_KNEE_VISIBILITY = float(os.environ.get("MIN_KNEE_VISIBILITY", "0.4"))
+
 screener = None
 _model_ok = None          # None = never tried, True/False = last outcome
 
@@ -394,14 +400,31 @@ async def extract_pose_endpoint(video: UploadFile = File(...)):
                 "Please record at least 4 seconds of walking."
             )
 
-        if detection_rate < 0.8:
+        # A flat percentage is the wrong test. The model samples three
+        # 48-frame windows and koa_features drops non-finite values before
+        # computing anything, so what matters is how many usable frames
+        # exist, not what share of a long clip they represent. An 80% gate
+        # rejected a 436-frame clip carrying 322 detected frames — roughly
+        # twice what the model consumes — while a short clip at 85% could
+        # carry far fewer and pass.
+        #
+        # So: a low rate floor to catch genuinely unusable footage, plus an
+        # absolute floor on detected frames. Both tunable without a deploy.
+        if detection_rate < MIN_DETECTION_RATE:
             quality_problems.append(
                 f"A pose was detected in only "
                 f"{detection_rate * 100:.0f}% of frames. "
                 "Please film with the whole body in frame."
             )
+        elif frames_detected < MIN_DETECTED_FRAMES:
+            quality_problems.append(
+                f"Only {frames_detected} frames had a usable pose, and at "
+                f"least {MIN_DETECTED_FRAMES} are needed. "
+                "Please record a longer clip, or move further from the camera "
+                "so the whole body stays in frame."
+            )
 
-        if mean_knee_visibility < 0.4:
+        if mean_knee_visibility < MIN_KNEE_VISIBILITY:
             quality_problems.append(
                 f"Knee visibility averaged "
                 f"{mean_knee_visibility:.2f}. "

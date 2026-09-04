@@ -55,6 +55,9 @@ pip install -r requirements.txt
 MAX_ANALYSIS_FRAMES=0 MAX_WIDTH=1280 uvicorn main:app --reload --port 8000
 ```
 
+The quality gate is tunable too: `MIN_DETECTION_RATE` (0.5),
+`MIN_DETECTED_FRAMES` (150) and `MIN_KNEE_VISIBILITY` (0.4).
+
 `MAX_ANALYSIS_FRAMES` (200) and `MAX_WIDTH` (512) default to values that fit
 a 512 MB host. They exist only for constrained deployments; locally there is
 no reason to throttle, and the analysis runs roughly ten times faster.
