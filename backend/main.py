@@ -412,6 +412,10 @@ async def extract_pose_endpoint(video: UploadFile = File(...)):
                 "mean_knee_visibility": mean_knee_visibility,
                 "source_fps": pose_stats.get("source_fps"),
                 "target_fps": pose_stats.get("target_fps"),
+                # true when the clip was longer than the analysis cap, so the
+                # report can say only the first stretch was read
+                "truncated": pose_stats.get("truncated", False),
+                "max_analysis_frames": pose_stats.get("max_analysis_frames"),
             },
             "csv_available": os.path.exists(csv_path),
             "prediction": result,

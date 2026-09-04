@@ -16,6 +16,16 @@ MODEL_PATH = os.path.join(
 # come out wrong. See BUILD_SPEC.md §8.
 TARGET_FPS = 25.0
 
+# Hard ceiling on frames handed to MediaPipe.
+#
+# The model samples 3 windows of 48 frames — roughly 144 frames of signal —
+# yet extraction previously ran over EVERY frame of the clip. A two-minute
+# video is ~3000 frames and took minutes of pose detection to produce a
+# score that needed a fraction of it, which is what made long uploads time
+# out. 750 frames is 30 seconds of walking at 25 fps: far more than the
+# model consumes, and it bounds the worst case to roughly 90 seconds.
+MAX_ANALYSIS_FRAMES = 750
+
 
 JOINTS = [
     "left_shoulder",
@@ -123,6 +133,8 @@ def extract_pose(video_path, output_csv=None):
         num_poses=1
     )
 
+    truncated = False
+
     try:
 
         with mp.tasks.vision.PoseLandmarker.create_from_options(
@@ -130,6 +142,15 @@ def extract_pose(video_path, output_csv=None):
         ) as landmarker:
 
             while True:
+
+                if frames_processed >= MAX_ANALYSIS_FRAMES:
+                    # enough signal for every window the model needs
+                    truncated = True
+                    print(
+                        f"Reached the {MAX_ANALYSIS_FRAMES}-frame analysis cap; "
+                        "ignoring the rest of the clip"
+                    )
+                    break
 
                 success, frame = cap.read()
 
@@ -297,4 +318,6 @@ def extract_pose(video_path, output_csv=None):
         "mean_knee_visibility": round(mean_knee_visibility, 3),
         "source_fps": round(src_fps, 2),
         "target_fps": TARGET_FPS,
+        "truncated": truncated,
+        "max_analysis_frames": MAX_ANALYSIS_FRAMES,
     }
