@@ -27,10 +27,14 @@ TARGET_FPS = 25.0
 # The ceiling is memory, not time. Measured on Render's 512 MB free
 # instance: 300 frames completes in ~55s, 750 frames gets OOM-killed
 # mid-request (the KOA model holds ~242 MB and MediaPipe's heavy pose
-# runtime adds ~170 MB on top). 400 frames is 16 seconds of walking at
-# 25 fps — still nearly three times the ~144 frames the model samples —
-# and stays well inside the envelope that has actually been tested.
-MAX_ANALYSIS_FRAMES = 400
+# runtime adds ~170 MB on top).
+#
+# 300 is the largest count VERIFIED to complete on the deployed instance
+# (12s of 720p, ~55s, no crash). 400 was an interpolation between a passing
+# and a failing case and was never confirmed, so this uses the measured
+# number instead of the guessed one. It is still more than twice the ~144
+# frames the model samples, and 12 seconds of walking at 25 fps.
+MAX_ANALYSIS_FRAMES = 300
 
 
 JOINTS = [
