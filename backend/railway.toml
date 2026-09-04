@@ -1,0 +1,26 @@
+# Railway config for the Stride backend.
+#
+# Set the service's Root Directory to `backend` in Railway and this file is
+# picked up automatically. Railway detects the Dockerfile without any
+# runtime conversion — the step that Render cannot do to an existing
+# service.
+#
+# Railway does not sleep, so there is no 50-second cold start. It is not
+# free beyond the one-time trial credit (~30 days), so check that against
+# your judging dates before relying on it.
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 300        # the model load takes a while on first boot
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+numReplicas = 1
+
+# Set in the Railway dashboard (Variables), not here — the frontend's public
+# URL is not known until it is deployed:
+#   ALLOWED_ORIGINS = https://<your-frontend-host>
+#   SCREENINGS_DB   = /var/data/screenings.db   (with a volume mounted there)

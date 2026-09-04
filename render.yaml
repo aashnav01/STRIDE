@@ -11,6 +11,12 @@
 # Both are therefore `sync: false`: Render prompts for them at deploy time,
 # and you paste each service's real public URL. See DEPLOY.md.
 #
+# The backend is named stride-api, not stride-backend. Render cannot convert
+# an existing service from the native Python runtime to Docker — but it will
+# create a service for a name it has not seen before. The rename is what
+# gets you a Docker build without hand-building the service. Delete the old
+# stride-backend afterwards.
+#
 # PERSISTENCE — read this before demoing:
 # Render's filesystem is ephemeral. On the free plan the screening database
 # is wiped by every deploy, restart, and sleep/wake cycle. The app is
@@ -21,7 +27,7 @@
 
 services:
   - type: web
-    name: stride-backend
+    name: stride-api
     # docker, not the native python runtime: MediaPipe needs libGLESv2 and
     # libEGL, which the native runtime lacks and cannot install
     runtime: docker

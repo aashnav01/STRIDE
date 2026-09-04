@@ -22,11 +22,19 @@ predicted from the blueprint either. Both variables are therefore
 
 ## Steps
 
-**1 — Create the blueprint**
+**1 — Sync the blueprint**
 
 Render Dashboard → **New → Blueprint** → connect `aashnav01/STRIDE`, branch
-`main`. It will prompt for the two `sync: false` variables. Leave them blank
-for now and apply.
+`main`. If a blueprint is already connected, open it and **Sync** instead.
+
+The backend service is named **stride-api**, not stride-backend. Render
+cannot convert an existing service from the native Python runtime to Docker,
+but it does create a service for a name it has not seen — so the rename is
+what produces a Docker build without hand-building the service. Delete the
+old `stride-backend` once `stride-api` is live.
+
+It will prompt for the two `sync: false` variables. Leave them blank for now
+and apply.
 
 The backend builds as a **Docker image**, not on Render's native Python
 runtime. MediaPipe links against OpenGL ES (`libGLESv2`, `libEGL`) even for
