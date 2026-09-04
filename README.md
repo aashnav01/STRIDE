@@ -69,6 +69,12 @@ npm run build && npm run preview
 
 then switch the network off mid-screening and back on to watch the queue drain.
 
+## Deploying
+
+See **[DEPLOY.md](DEPLOY.md)**. The two services need each other's public
+URLs, which Render cannot supply automatically — `VITE_API_URL` is baked in
+at build time and must be set before the frontend is built.
+
 ## Limits
 
 This is a screening aid, **not a diagnosis**. Knee OA is diagnosed clinically and radiographically.

@@ -1,9 +1,15 @@
 # Render Blueprint for Stride.
 #
-# The frontend's API host and the backend's allowed origin are wired to each
-# other with fromService, so neither carries a hardcoded hostname and a
-# rename cannot silently break CORS. Render supplies a bare hostname with no
-# scheme, so both ends prepend https:// when one is missing.
+# VITE_API_URL and ALLOWED_ORIGINS are deliberately NOT wired with
+# fromService. That returns Render's INTERNAL hostname, which the browser
+# cannot resolve — the frontend's JavaScript runs on the user's device,
+# outside Render's private network, so it needs the public .onrender.com
+# URL. Render also appends a random suffix when a service name is taken
+# (hence the old koa-backend-ygct), so the public URL is not predictable
+# from the blueprint either.
+#
+# Both are therefore `sync: false`: Render prompts for them at deploy time,
+# and you paste each service's real public URL. See DEPLOY.md.
 #
 # PERSISTENCE — read this before demoing:
 # Render's filesystem is ephemeral. On the free plan the screening database
@@ -32,11 +38,9 @@ services:
         value: /tmp/screenings.db
       - key: PYTHON_VERSION
         value: 3.12.7
+      # the frontend's public URL, e.g. https://stride-frontend-ab12.onrender.com
       - key: ALLOWED_ORIGINS
-        fromService:
-          name: stride-frontend
-          type: web
-          property: host
+        sync: false
 
   - type: web
     name: stride-frontend
@@ -45,11 +49,9 @@ services:
     buildCommand: npm ci && npm run build
     staticPublishPath: ./dist
     envVars:
+      # the backend's public URL, e.g. https://stride-backend-cd34.onrender.com
       - key: VITE_API_URL
-        fromService:
-          name: stride-backend
-          type: web
-          property: host
+        sync: false
     routes:
       # single-page app: unmatched paths resolve to the shell
       - type: rewrite
