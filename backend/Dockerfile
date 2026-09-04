@@ -44,7 +44,9 @@ COPY . .
 ENV SCREENINGS_DB=/var/data/screenings.db
 RUN mkdir -p /var/data
 
-# Render supplies $PORT at runtime
-ENV PORT=8000
-EXPOSE 8000
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Render injects PORT=10000 and probes that port to decide the service is
+# up. EXPOSE must agree with it, or the platform scans the wrong port,
+# reports "Timed Out", and only afterwards notices the real one.
+ENV PORT=10000
+EXPOSE 10000
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-10000}"]

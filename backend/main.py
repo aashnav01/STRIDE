@@ -135,7 +135,9 @@ except Exception as e:
 # Health check
 # ============================================================
 
-@app.get("/")
+# Render's readiness probe uses HEAD, and Starlette does not add HEAD to a
+# GET route automatically — an unanswered probe reads as a failed deploy.
+@app.api_route("/", methods=["GET", "HEAD"])
 def root():
     return {
         "status": "online",
@@ -181,7 +183,7 @@ def get_summary():
 _BOOTED_AT = time.time()
 
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 def health():
     """Diagnostics for a slow or failing deploy.
 
