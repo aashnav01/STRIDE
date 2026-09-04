@@ -14,7 +14,7 @@ const STEP_KEYS = ['progUpload', 'progPose', 'progMetrics', 'progScore']
 const RAD = Math.PI / 180
 const SEG = { thigh: 15, shank: 15, upper: 11, fore: 10, spine: 18 }
 
-const WalkProgress = ({ step }) => {
+const WalkProgress = ({ step, slow }) => {
   const { t } = useLanguage()
   const reduced = useReducedMotion()
   const ref = useRef(null)
@@ -94,6 +94,7 @@ const WalkProgress = ({ step }) => {
   return (
     <div className="walkprog">
       <canvas ref={ref} className="walkprog-canvas" aria-hidden="true" />
+      {slow && <p className="walkprog-slow">{t('progSlow')}</p>}
       <ol className="walkprog-steps">
         {STEP_KEYS.map((k, i) => (
           <li key={k} className={i < step ? 'done' : i === step ? 'on' : ''}>

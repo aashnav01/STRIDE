@@ -2086,3 +2086,13 @@ html[data-lang="mni"] .why-ner > p:first-of-type::first-letter {
   /* the medallion still needs its centring translate */
   .medallion { translate: -50% -50% !important; }
 }
+
+/* shown only when analysis runs unusually long, so a slow request reads as
+   slow rather than broken */
+.walkprog-slow {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  animation: riseIn 0.4s ease both;
+}

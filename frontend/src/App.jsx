@@ -43,8 +43,14 @@ if (import.meta.env.PROD) {
   }
 }
 
-const PROGRESS_STEP_COUNT = 4     // labels live in WalkProgress, translated
-const PROGRESS_STEP_MS = 7500
+/* Step timings are weighted to where the work actually goes, not spread
+   evenly. Pose extraction dominates — MediaPipe runs on every frame, and at
+   25fps a 10s clip is ~250 frames — while scoring is milliseconds. An even
+   split parked the UI on "Working out the risk" for a minute, which reads
+   as a hang. Cumulative milliseconds at which each step begins: */
+const PROGRESS_STEP_AT = [0, 3500, 34000, 44000]
+/* after this long, say so rather than looking stuck */
+const PROGRESS_SLOW_MS = 62000
 
 function App() {
   const { t } = useLanguage()
@@ -52,6 +58,7 @@ function App() {
   const [videoUrl, setVideoUrl] = useState(null)
   const [analyzing, setAnalyzing] = useState(false)
   const [progressStep, setProgressStep] = useState(0)
+  const [slow, setSlow] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
   const [intake, setIntake] = useState({ patient: {}, symptoms: {} })
@@ -66,12 +73,19 @@ function App() {
     if (online) syncPending(API_URL).catch(() => {})
   }, [online])
 
-  /* ---------- fake step progress while analyzing ---------- */
+  /* ---------- step progress while analyzing ---------- */
   useEffect(() => {
     if (!analyzing) return
+    const started = Date.now()
     const id = setInterval(() => {
-      setProgressStep(s => Math.min(s + 1, PROGRESS_STEP_COUNT - 1))
-    }, PROGRESS_STEP_MS)
+      const elapsed = Date.now() - started
+      let step = 0
+      for (let i = 0; i < PROGRESS_STEP_AT.length; i++) {
+        if (elapsed >= PROGRESS_STEP_AT[i]) step = i
+      }
+      setProgressStep(step)
+      setSlow(elapsed > PROGRESS_SLOW_MS)
+    }, 500)
     return () => clearInterval(id)
   }, [analyzing])
 
@@ -93,7 +107,7 @@ function App() {
   /* ---------- analyze ---------- */
   const handleAnalyze = async () => {
     if (!selectedVideo) return
-    setAnalyzing(true); setProgressStep(0); setResult(null); setError(null)
+    setAnalyzing(true); setProgressStep(0); setSlow(false); setResult(null); setError(null)
     const formData = new FormData()
     formData.append('video', selectedVideo)
     try {
@@ -253,7 +267,7 @@ function App() {
             {analyzing ? t('analyzing') : (<><Play size={18} /> {t('analyzeVideo')}</>)}
           </button>
 
-          {analyzing && <WalkProgress step={progressStep} />}
+          {analyzing && <WalkProgress step={progressStep} slow={slow} />}
 
           {error && (
             <div className="error-message">

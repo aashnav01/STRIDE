@@ -14,6 +14,7 @@ export const LANGUAGES = [
 
 export const translations = {
   en: {
+    progSlow: 'Still working. A longer video, or a slow connection, can take a couple of minutes.',
     homeHeading: 'Who are we screening today?',
     progUpload: 'Sending the video',
     progPose: 'Finding the body',
@@ -137,6 +138,7 @@ export const translations = {
     whyNERIntro: 'Knee osteoarthritis runs high across the Northeast, especially among tea-garden and agricultural workers whose daily labor strains the knees for decades. Yet specialist orthopedic care and imaging are concentrated in a handful of cities, leaving many without an easy way to get screened.',
   },
   as: {
+    progSlow: "এতিয়াও চলি আছে। দীঘল ভিডিঅ' বা লাহে নেটৱৰ্ক হ'লে দুই-তিনি মিনিট লাগিব পাৰে।",
     homeHeading: 'আজি কাক পৰীক্ষা কৰিব?',
     progUpload: 'ভিডিঅ\u0027 পঠিওৱা হৈছে',
     progPose: 'শৰীৰ বিচাৰি উলিওৱা হৈছে',
@@ -260,6 +262,7 @@ export const translations = {
     whyNERIntro: 'উত্তৰ-পূৱত আঁঠুৰ অষ্টিঅ\'আৰ্থ্ৰাইটিছ বহুত বেছি, বিশেষকৈ চাহ বাগানৰ আৰু কৃষি শ্ৰমিকসকলৰ মাজত যিসকলৰ প্ৰতিদিনৰ কামে বছৰ বছৰ ধৰি আঁঠুত চাপ পেলায়। কিন্তু বিশেষজ্ঞ চিকিৎসা আৰু ইমেজিং কেইখনমান চহৰতহে আছে।',
   },
   mni: {
+    progSlow: 'হৌজিকসু থবক তৌরি। ভিডিও শাংলবদি নত্রগা নেৎৱার্ক তপ্লবদি মিনিট অনি-অহুম চংবা য়াই।',
     homeHeading: 'ঙসি কনাবু স্ক্রিন তৌগদগে?',
     progUpload: 'ভিডিও থারি',
     progPose: 'হাক্চাং থিরি',
